@@ -1,6 +1,6 @@
 PREFIX=/home/ubuntu/src/dovecot-2.2.31/build
 DOVECOT_INC=$(PREFIX)/include/dovecot
-CFLAGS=-std=gnu99 -fPIC -shared -Wall -I$(DOVECOT_INC) -DHAVE_CONFIG_H
+CFLAGS=-std=gnu99 -fPIC -shared -Wall -I$(DOVECOT_INC) -DHAVE_CONFIG_H -DDOVECOT_PLUGIN_API_2_2
 MODULE_NAME=lib95_imap_hello_plugin.so
 MODULE_LANAME=lib95_imap_hello_plugin.la
 
@@ -18,6 +18,6 @@ clean:
 
 install: $(MODULE_NAME)
 	mkdir -p $(INSTALL_DEST)
-	install -g bin -o root -m 0644 $(MODULE_NAME) $(MODULE_LANAME) $(INSTALL_DEST)
+	install $(MODULE_NAME) $(MODULE_LANAME) $(INSTALL_DEST)
 
 .PHONY: all lib95_imap_hello_plugin.so install clean
