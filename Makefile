@@ -52,8 +52,11 @@ $(TARGET_LIB_SO): $(O_FILES)
 # compile mruby
 mruby:
 	test -f $(DOVECOT_TARGET_DIR)/lib/libmruby.a || (cd $(MRUBY_ROOT) && \
-                make && cp build/host/lib/libmruby.a $(DOVECOT_TARGET_DIR)/lib/. && \
+                MRUBY_CONFIG=../build_config.rb make && cp build/host/lib/libmruby.a $(DOVECOT_TARGET_DIR)/lib/. && \
                 cp -r include/* $(DOVECOT_TARGET_DIR)/include/.)
+
+mruby-clean:
+	rm -f $(DOVECOT_TARGET_DIR)/lib/libmruby.a
 
 dovecot-clean:
 	rm -f $(DOVECOT_SOURCE_FILE) $(DOVECOT_SOURCE_SIG_FILE) $(DOVECOT_KEYRING_FILE)
@@ -92,6 +95,6 @@ test-focus: $(TARGET_LIB_SO)
 log:
 	tail -f dovecot/log/dovecot.log
 
-clober: clean dovecot-clean
+clober: clean dovecot-clean mruby-clean
 
 .PHONY: clean setup test log
