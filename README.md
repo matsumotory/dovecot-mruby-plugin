@@ -1,6 +1,6 @@
-# dovecot-imap-hello-plugin
+# [WIP] dovecot-mruby-plugin
 
-Experimet Dovecot Plugin Develop Environment
+Experimet Dovecot Plugin Develop Environment for mruby
 
 ## Quick Build
 
