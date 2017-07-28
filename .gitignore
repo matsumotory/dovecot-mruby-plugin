@@ -13,6 +13,7 @@ dovecot/run
 dovecot/home/test/mail
 dovecot/staging
 dovecot/configuration/dovecot.conf
+dovecot/configuration/mailservice.sqlite
 dovecot/configuration/dovecot-sql.conf.ext
 dovecot/configuration/conf.d/10-master.conf
 dovecot/configuration/conf.d/10-logging.conf
