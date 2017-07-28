@@ -1,4 +1,4 @@
-# [WIP] dovecot-mruby-plugin
+# [WIP] dovecot-mruby-plugin [![Build Status](https://travis-ci.org/matsumotory/dovecot-mruby-plugin.svg?branch=master)](https://travis-ci.org/matsumotory/dovecot-mruby-plugin)
 
 Experimet Dovecot Plugin Develop Environment for mruby
 
