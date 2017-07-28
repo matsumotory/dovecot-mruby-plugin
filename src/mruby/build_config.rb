@@ -34,6 +34,10 @@ MRuby::Build.new do |conf|
   #   cc.compile_options = "%{flags} -MMD -o %{outfile} -c %{infile}"
   # end
 
+  conf.cc do |cc|
+    cc.flags = [ENV['CFLAGS'], '-fPIC']
+  end
+
   # mrbc settings
   # conf.mrbc do |mrbc|
   #   mrbc.compile_options = "-g -B%{funcname} -o-" # The -g option is required for line numbers
