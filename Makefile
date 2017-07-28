@@ -69,7 +69,7 @@ dovecot-extract: dovecot-download
 		(tar xzf $(DOVECOT_SOURCE_FILE) -C $(DOVECOT_DIR) && mv $(DOVECOT_DIR)/dovecot-$(DOVECOT_VERSION) $(DOVECOT_SOURCE_DIR))
 
 dovecot-configure: dovecot-extract
-	cd $(DOVECOT_SOURCE_DIR) && ./configure --prefix $(DOVECOT_TARGET_DIR) --with-sqlite
+	cd $(DOVECOT_SOURCE_DIR) && ./configure --prefix $(DOVECOT_TARGET_DIR) --with-sqlite --enable-silent-rules
 
 dovecot-compile: dovecot-configure
 	cd $(DOVECOT_SOURCE_DIR) && make
