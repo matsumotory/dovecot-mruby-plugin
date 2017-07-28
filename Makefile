@@ -12,7 +12,7 @@ TARGET_LIB_SO=dovecot/target/lib/dovecot/lib95_imap_hello_plugin.so
 
 # for mruby
 MRUBY_ROOT=$(SOURCE_DIR)/mruby
-MRUBY_MAK_FILE := $(MRUBY_ROOT)/src/mruby/build/host/lib/libmruby.flags.mak
+MRUBY_MAK_FILE := $(MRUBY_ROOT)/build/host/lib/libmruby.flags.mak
 ifeq ($(wildcard $(MRUBY_MAK_FILE)),)
   MRUBY_CFLAGS =
   MRUBY_LDFLAGS =
