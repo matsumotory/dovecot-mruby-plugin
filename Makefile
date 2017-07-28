@@ -10,6 +10,18 @@ DOVECOT_INCLUDE_DIR=dovecot/target/include
 SOURCE_DIR=src
 TARGET_LIB_SO=dovecot/target/lib/dovecot/lib95_imap_hello_plugin.so
 
+# for mruby
+MRUBY_ROOT=$(SOURCE_DIR)/mruby
+MRUBY_MAK_FILE := $(MRUBY_ROOT)/src/mruby/build/host/lib/libmruby.flags.mak
+ifeq ($(wildcard $(MRUBY_MAK_FILE)),)
+  MRUBY_CFLAGS =
+  MRUBY_LDFLAGS =
+  MRUBY_LIBS =
+  MRUBY_LDFLAGS_BEFORE_LIBS =
+else
+  include $(MRUBY_MAK_FILE)
+endif
+
 C_FILES=$(shell ls $(SOURCE_DIR)/*.c)
 H_FILES=$(C_FILES:.c=.h)
 O_FILES=$(C_FILES:.c=.o)
@@ -19,8 +31,9 @@ CFLAGS=-std=gnu99 \
 	-Wall -W -Wmissing-prototypes -Wmissing-declarations -Wpointer-arith -Wchar-subscripts -Wformat=2 \
 	-Wbad-function-cast -fno-builtin-strftime -Wstrict-aliasing=2 -Wl,-z,relro,-z,now \
 	-fPIC -fstack-check -ftrapv -DPIC -D_FORTIFY_SOURCE=2 -DHAVE_CONFIG_H \
-	-I$(DOVECOT_INCLUDE_DIR)
-LDFLAGS=-gs -shared -rdynamic -Wl,-soname,lib95_imap_hello_plugin.so.1
+	-I$(DOVECOT_INCLUDE_DIR) $(MRUBY_CFLAGS)
+LDFLAGS=-gs -shared -rdynamic -Wl,-soname,lib95_imap_hello_plugin.so.1 $(MRUBY_LDFLAGS)
+LIBS=$(MRUBY_LDFLAGS_BEFORE_LIBS) $(MRUBY_LIBS)
 
 ifeq ($(DEBUG), 1)
 	CFLAGS+=-DDEBUG_STREAMS -g
@@ -33,7 +46,14 @@ $(SOURCE_DIR)/%.o: %.c $(H_FILES)
 
 $(TARGET_LIB_SO): $(O_FILES)
 	mkdir -p $(shell dirname $(TARGET_LIB_SO))
-	$(CC) -o $@ $^ $(LDFLAGS)
+	$(CC) -o $@ $^ $(LDFLAGS) $(LIBS) 
+
+
+# compile mruby
+mruby:
+	test -f $(DOVECOT_TARGET_DIR)/lib/libmruby.a || (cd $(MRUBY_ROOT) && \
+                make && cp build/host/lib/libmruby.a $(DOVECOT_TARGET_DIR)/lib/. && \
+                cp -r include/* $(DOVECOT_TARGET_DIR)/include/.)
 
 dovecot-clean:
 	rm -f $(DOVECOT_SOURCE_FILE) $(DOVECOT_SOURCE_SIG_FILE) $(DOVECOT_KEYRING_FILE)
