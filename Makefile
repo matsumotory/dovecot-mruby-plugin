@@ -8,7 +8,7 @@ DOVECOT_TARGET_DIR=$(DOVECOT_DIR)/target
 DOVECOT_INCLUDE_DIR=dovecot/target/include
 
 SOURCE_DIR=src
-TARGET_LIB_SO=dovecot/target/lib/dovecot/lib95_imap_hello_plugin.so
+TARGET_LIB_SO=dovecot/target/lib/dovecot/lib95_imap_mruby_plugin.so
 
 # for mruby
 MRUBY_ROOT=$(SOURCE_DIR)/mruby
@@ -32,7 +32,7 @@ CFLAGS=-std=gnu99 \
 	-Wbad-function-cast -fno-builtin-strftime -Wstrict-aliasing=2 -Wl,-z,relro,-z,now \
 	-fPIC -fstack-check -ftrapv -DPIC -D_FORTIFY_SOURCE=2 -DHAVE_CONFIG_H \
 	-I$(DOVECOT_INCLUDE_DIR) $(MRUBY_CFLAGS)
-LDFLAGS=-gs -shared -rdynamic -Wl,-soname,lib95_imap_hello_plugin.so.1 $(MRUBY_LDFLAGS)
+LDFLAGS=-gs -shared -rdynamic -Wl,-soname,lib95_imap_mruby_plugin.so.1 $(MRUBY_LDFLAGS)
 LIBS=$(MRUBY_LDFLAGS_BEFORE_LIBS) $(MRUBY_LIBS)
 
 ifeq ($(DEBUG), 1)
