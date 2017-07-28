@@ -1,12 +1,24 @@
 dist: trusty
-sudo: required
 language: c
 compiler:
   - gcc
-  - clang
-before_install:
-  - sudo apt-get update
-  - sudo apt-get -y install rake bison git gperf automake m4  autoconf libtool cmake pkg-config libcunit1-dev ragel
+sudo: false
+addons:
+  apt:
+    packages:
+    - g++-4.9
+    - rake
+    - bison
+    - git 
+    - gperf
+    - automake
+    - m4
+    - autoconf
+    - libtool
+    - cmake
+    - pkg-config
+    - libcunit1-dev
+    - ragel
 script:
   - make setup
   - make test
