@@ -53,7 +53,7 @@ static bool cmd_mruby(struct client_command_context *cmd)
     v = mrb_obj_value(mrb->exc);
   }
 
-  client_send_command_error(cmd, mrb_str_to_cstr(mrb, mrb_inspect(mrb, v)));
+  client_send_tagline(cmd, mrb_str_to_cstr(mrb, mrb_inspect(mrb, v)));
   return TRUE;
 }
 
