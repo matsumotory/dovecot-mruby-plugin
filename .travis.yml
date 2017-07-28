@@ -6,7 +6,7 @@ sudo: false
 addons:
   apt:
     packages:
-    - g++-4.9
+    - g++
     - rake
     - bison
     - git 
