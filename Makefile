@@ -57,9 +57,10 @@ mruby:
 
 mruby-clean:
 	rm -f $(DOVECOT_TARGET_DIR)/lib/libmruby.a
+	cd $(MRUBY_ROOT) && make clean
 
 dovecot-clean:
-	rm -f $(DOVECOT_SOURCE_FILE) $(DOVECOT_SOURCE_SIG_FILE) $(DOVECOT_KEYRING_FILE)
+	cd $(DOVECOT_SOURCE_DIR) && make clean
 
 dovecot-download:
 	-test ! -f $(DOVECOT_SOURCE_FILE) && curl -o $(DOVECOT_SOURCE_FILE) $(DOVECOT_SOURCE_URL)
@@ -95,6 +96,7 @@ test-focus: $(TARGET_LIB_SO)
 log:
 	tail -f dovecot/log/dovecot.log
 
-clober: clean dovecot-clean mruby-clean
+clobber: clean dovecot-clean mruby-clean
+	rm -rf $(DOVECOT_SOURCE_FILE) $(DOVECOT_SOURCE_DIR) $(DOVECOT_TARGET_DIR)
 
 .PHONY: clean setup test log
