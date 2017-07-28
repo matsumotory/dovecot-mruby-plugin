@@ -5,7 +5,7 @@
 #include "dovecot/imap-common.h"
 #include "dovecot/module-context.h"
 
-#include "imap-hello-plugin.h"
+#include "imap-mruby-plugin.h"
 
 const char *imap_hello_plugin_version = DOVECOT_ABI_VERSION;
 
