@@ -1,9 +1,10 @@
-#include "config.h"
-#include "lib.h"
-#include "str.h"
-#include "imap-client.h"
-#include "imap-common.h"
-#include "module-context.h"
+#include "dovecot/config.h"
+#include "dovecot/lib.h"
+#include "dovecot/str.h"
+#include "dovecot/imap-client.h"
+#include "dovecot/imap-common.h"
+#include "dovecot/module-context.h"
+
 #include "imap-hello-plugin.h"
 
 const char *imap_hello_plugin_version = DOVECOT_ABI_VERSION;
