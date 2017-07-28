@@ -1,6 +1,8 @@
 # [WIP] dovecot-mruby-plugin [![Build Status](https://travis-ci.org/matsumotory/dovecot-mruby-plugin.svg?branch=master)](https://travis-ci.org/matsumotory/dovecot-mruby-plugin)
 
-Experimet Dovecot Plugin Develop Environment for mruby
+Programmable IMAP/POP Server Scripting with mruby.
+
+Experimet Dovecot Plugin Develop Environment for mruby.
 
 ## Quick Build
 
@@ -31,7 +33,5 @@ Escape character is '^]'.
 1 MRUBY 3*9
 1 27 (0.001 + 0.000 secs).
 ```
-
-- build system
 
 special thanks: https://github.com/posteo/scrambler-plugin
