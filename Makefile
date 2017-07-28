@@ -54,6 +54,9 @@ dovecot-compile: dovecot-configure
 dovecot-install: dovecot-compile
 	cd $(DOVECOT_SOURCE_DIR) && make install
 
+dovecot-run:
+	cd $(DOVECOT_DIR) && ./target/sbin/dovecot -c ./configuration/dovecot.conf
+
 clean:
 	rm -f $(O_FILES) $(TARGET_LIB_SO)
 
