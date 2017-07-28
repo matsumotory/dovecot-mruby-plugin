@@ -1,8 +1,6 @@
 # [WIP] dovecot-mruby-plugin [![Build Status](https://travis-ci.org/matsumotory/dovecot-mruby-plugin.svg?branch=master)](https://travis-ci.org/matsumotory/dovecot-mruby-plugin)
 
-Programmable IMAP/POP Server Scripting with mruby.
-
-Experimet Dovecot Plugin Develop Environment for mruby.
+dovecot with mruby is a programmable IMAP/POP server scripting with mruby. Experimet Dovecot Plugin Develop Environment for mruby. [pmilter](https://github.com/matsumotory/pmilter) is a programmable Milter server scripting with mruby.
 
 ## Quick Build
 
@@ -17,6 +15,8 @@ make
 make setup
 make test
 ```
+
+## Play Ground
 
 ```
 make run
@@ -34,4 +34,4 @@ Escape character is '^]'.
 1 27 (0.001 + 0.000 secs).
 ```
 
-special thanks: https://github.com/posteo/scrambler-plugin
+build and test system: special thanks: https://github.com/posteo/scrambler-plugin
