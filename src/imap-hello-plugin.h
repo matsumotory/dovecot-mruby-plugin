@@ -7,4 +7,3 @@ void imap_hello_plugin_init(struct module *module);
 void imap_hello_plugin_deinit(void);
 
 #endif
-
