@@ -31,7 +31,7 @@ describe 'capability hello matsumotory' do
 
     it 'get capability matsumotory command' do
       line = @mailer.login 'test', 'testPassword'
-      line.should =~ /MATSUMOTORY/
+      line.should =~ /MRUBY/
     end
   end
 end
