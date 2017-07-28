@@ -21,4 +21,5 @@ addons:
     - ragel
 script:
   - make setup
+  - make mruby
   - make test
