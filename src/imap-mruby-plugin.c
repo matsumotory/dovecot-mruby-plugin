@@ -74,10 +74,22 @@ static void imap_mruby_client_created(struct client **clientp)
   }
 }
 
+static void mruby_command_pre(struct client_command_context *cmd)
+{
+  i_info("mruby pre");
+}
+
+static void mruby_command_post(struct client_command_context *cmd)
+{
+  i_info("mruby post");
+}
+
 void imap_mruby_plugin_init(struct module *module)
 {
   i_info("mruby_plugin_init");
   command_register("MRUBY", cmd_mruby, 0);
+  command_hook_register(mruby_command_pre, mruby_command_post);
+
   imap_mruby_module = module;
   next_hook_client_created = imap_client_created_hook_set(imap_mruby_client_created);
 }
@@ -85,6 +97,7 @@ void imap_mruby_plugin_init(struct module *module)
 void imap_mruby_plugin_deinit(void)
 {
   command_unregister("MRUBY");
+  command_hook_unregister(mruby_command_pre, mruby_command_post);
   imap_client_created_hook_set(next_hook_client_created);
 }
 
