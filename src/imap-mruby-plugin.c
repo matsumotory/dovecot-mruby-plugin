@@ -30,6 +30,7 @@ void imap_mruby_plugin_deinit(void);
 
 static bool cmd_mruby(struct client_command_context *cmd)
 {
+  i_info("%s", __func__);
   mrb_value v;
   const struct imap_arg *args;
   const char *code;
@@ -67,6 +68,7 @@ static bool cmd_mruby(struct client_command_context *cmd)
 
 static void imap_mruby_client_created(struct client **clientp)
 {
+  i_info("%s", __func__);
   struct client *client = *clientp;
   struct imap_mruby_context *imctx;
 
@@ -87,6 +89,7 @@ static void imap_mruby_client_created(struct client **clientp)
 
 static void mruby_command_run_getenv(struct client_command_context *cmd, const char *env)
 {
+  i_info("%s", __func__);
   struct client *client = cmd->client;
   struct imap_mruby_context *imctx = IMAP_MRUBY_IMAP_CONTEXT(client);
   mrb_state *mrb = imctx->mrb;
@@ -120,6 +123,7 @@ static void mruby_command_run_getenv(struct client_command_context *cmd, const c
 
 static void mruby_command_pre(struct client_command_context *cmd)
 {
+  i_info("%s", __func__);
   //* mailbox management hook */
   MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "select");
   MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "examine");
@@ -159,6 +163,7 @@ static void mruby_command_pre(struct client_command_context *cmd)
 
 static void mruby_command_post(struct client_command_context *cmd)
 {
+  i_info("%s", __func__);
   //* mailbox management hook */
   MRUBY_ADD_COMMAND_POST_HOOK(cmd, "select");
   MRUBY_ADD_COMMAND_POST_HOOK(cmd, "examine");
@@ -198,7 +203,7 @@ static void mruby_command_post(struct client_command_context *cmd)
 
 void imap_mruby_plugin_init(struct module *module)
 {
-  i_info("mruby_plugin_init");
+  i_info("%s", __func__);
 
   /* add MRUBY command */
   command_register("MRUBY", cmd_mruby, 0);
@@ -212,6 +217,8 @@ void imap_mruby_plugin_init(struct module *module)
 
 void imap_mruby_plugin_deinit(void)
 {
+  i_info("%s", __func__);
+
   command_unregister("MRUBY");
   command_hook_unregister(mruby_command_pre, mruby_command_post);
   imap_client_created_hook_set(next_hook_client_created);
