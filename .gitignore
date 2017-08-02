@@ -22,3 +22,7 @@ dovecot/configuration/conf.d/auth-passwdfile.conf.ext
 dovecot/configuration/conf.d/auth-sql.conf.ext
 vendor/
 .bundle/
+GPATH
+GRTAGS
+GTAGS
+

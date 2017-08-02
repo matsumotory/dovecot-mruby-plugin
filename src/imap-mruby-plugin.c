@@ -1,15 +1,10 @@
-#include "dovecot/config.h"
-#include "dovecot/lib.h"
-#include "dovecot/str.h"
-#include "dovecot/imap-client.h"
-#include "dovecot/imap-common.h"
-#include "dovecot/module-context.h"
-
 #include "imap-mruby-plugin.h"
 
 #include "mruby.h"
 #include "mruby/compile.h"
 #include "mruby/string.h"
+
+#include "imap-mruby-plugin-init.h"
 
 #define IMAP_MRUBY_IMAP_CONTEXT(obj) MODULE_CONTEXT(obj, imap_mruby_imap_module)
 
@@ -24,17 +19,14 @@
     return;                                                                                                            \
   }
 
-struct imap_mruby_context {
-  union imap_module_context module_ctx;
-  mrb_state *mrb;
-};
-
 const char *imap_mruby_plugin_version = DOVECOT_ABI_VERSION;
 
 static struct module *imap_mruby_module;
 static imap_client_created_func_t *next_hook_client_created;
-
 static MODULE_CONTEXT_DEFINE_INIT(imap_mruby_imap_module, &imap_module_register);
+
+void imap_mruby_plugin_init(struct module *module);
+void imap_mruby_plugin_deinit(void);
 
 static bool cmd_mruby(struct client_command_context *cmd)
 {
@@ -82,6 +74,9 @@ static void imap_mruby_client_created(struct client **clientp)
     str_append(client->capability_string, " MRUBY");
     imctx = p_new(client->pool, struct imap_mruby_context, 1);
     imctx->mrb = mrb_open();
+    imctx->mruby_ctx = p_new(client->pool, imap_mruby_internal_context, 1);
+    /* dovecot class init */
+    imap_mruby_class_init(imctx->mrb);
     MODULE_CONTEXT_SET(client, imap_mruby_imap_module, imctx);
   }
 
@@ -108,6 +103,11 @@ static void mruby_command_run_getenv(struct client_command_context *cmd, const c
 
   i_info("%s inline-code: %s", env, code_str);
 
+  imctx->mruby_ctx->client = client;
+  imctx->mruby_ctx->cmd = cmd;
+  imctx->mruby_ctx->imctx = imctx;
+
+  mrb->ud = imctx->mruby_ctx;
   v = mrb_load_string_cxt(mrb, code_str, c);
   mrbc_context_free(mrb, c);
 
