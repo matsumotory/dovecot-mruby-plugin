@@ -99,4 +99,11 @@ log:
 clobber: clean dovecot-clean mruby-clean
 	rm -rf $(DOVECOT_SOURCE_FILE) $(DOVECOT_SOURCE_DIR) $(DOVECOT_TARGET_DIR)
 
+start: dovecot-run
+
+restart: 
+	killall dovecot
+	sleep 1
+	cd $(DOVECOT_DIR) && ./target/sbin/dovecot -c ./configuration/dovecot.conf
+
 .PHONY: clean setup test log
