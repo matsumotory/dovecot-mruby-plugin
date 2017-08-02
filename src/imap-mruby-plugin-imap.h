@@ -10,8 +10,8 @@
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  YOUR NAME (), 
- *   Organization:  
+ *         Author:  YOUR NAME (),
+ *   Organization:
  *
  * =====================================================================================
  */
@@ -24,4 +24,3 @@
 void imap_mruby_imap_class_init(mrb_state *mrb, struct RClass *calss);
 
 #endif // IMAP_MRUBY_PLUGIN_IMAP_H
-
