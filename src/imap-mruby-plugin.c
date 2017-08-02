@@ -13,14 +13,14 @@
 
 #define IMAP_MRUBY_IMAP_CONTEXT(obj) MODULE_CONTEXT(obj, imap_mruby_imap_module)
 
-#define MRUBY_ADD_COMMAND_PRE_HOOK(cmd_ctx, cmd_name)                                                                           \
-  if (strcasecmp(cmd_ctx->name, cmd_name) == 0) {                                                                          \
-    mruby_command_run_getenv(cmd_ctx, "mruby_pre_" cmd_name);                                                              \
+#define MRUBY_ADD_COMMAND_PRE_HOOK(cmd_ctx, cmd_name)                                                                  \
+  if (strcasecmp(cmd_ctx->name, cmd_name) == 0) {                                                                      \
+    mruby_command_run_getenv(cmd_ctx, "mruby_pre_" cmd_name);                                                          \
     return;                                                                                                            \
   }
-#define MRUBY_ADD_COMMAND_POST_HOOK(cmd_ctx, cmd_name)                                                                          \
-  if (strcasecmp(cmd_ctx->name, cmd_name) == 0) {                                                                          \
-    mruby_command_run_getenv(cmd_ctx, "mruby_post_" cmd_name);                                                             \
+#define MRUBY_ADD_COMMAND_POST_HOOK(cmd_ctx, cmd_name)                                                                 \
+  if (strcasecmp(cmd_ctx->name, cmd_name) == 0) {                                                                      \
+    mruby_command_run_getenv(cmd_ctx, "mruby_post_" cmd_name);                                                         \
     return;                                                                                                            \
   }
 
