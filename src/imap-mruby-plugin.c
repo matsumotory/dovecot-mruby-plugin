@@ -13,14 +13,14 @@
 
 #define IMAP_MRUBY_IMAP_CONTEXT(obj) MODULE_CONTEXT(obj, imap_mruby_imap_module)
 
-#define MRUBY_ADD_COMMAND_PRE_HOOK(cmd_name)                                                                           \
-  if (strcasecmp(cmd->name, cmd_name) == 0) {                                                                          \
-    mruby_command_run_getenv(cmd, "mruby_pre_" cmd_name);                                                              \
+#define MRUBY_ADD_COMMAND_PRE_HOOK(cmd_ctx, cmd_name)                                                                           \
+  if (strcasecmp(cmd_ctx->name, cmd_name) == 0) {                                                                          \
+    mruby_command_run_getenv(cmd_ctx, "mruby_pre_" cmd_name);                                                              \
     return;                                                                                                            \
   }
-#define MRUBY_ADD_COMMAND_POST_HOOK(cmd_name)                                                                          \
-  if (strcasecmp(cmd->name, cmd_name) == 0) {                                                                          \
-    mruby_command_run_getenv(cmd, "mruby_post_" cmd_name);                                                             \
+#define MRUBY_ADD_COMMAND_POST_HOOK(cmd_ctx, cmd_name)                                                                          \
+  if (strcasecmp(cmd_ctx->name, cmd_name) == 0) {                                                                          \
+    mruby_command_run_getenv(cmd_ctx, "mruby_post_" cmd_name);                                                             \
     return;                                                                                                            \
   }
 
@@ -121,79 +121,79 @@ static void mruby_command_run_getenv(struct client_command_context *cmd, const c
 static void mruby_command_pre(struct client_command_context *cmd)
 {
   //* mailbox management hook */
-  MRUBY_ADD_COMMAND_PRE_HOOK("select");
-  MRUBY_ADD_COMMAND_PRE_HOOK("examine");
-  MRUBY_ADD_COMMAND_PRE_HOOK("create");
-  MRUBY_ADD_COMMAND_PRE_HOOK("delete");
-  MRUBY_ADD_COMMAND_PRE_HOOK("rename");
-  MRUBY_ADD_COMMAND_PRE_HOOK("subscribe");
-  MRUBY_ADD_COMMAND_PRE_HOOK("unsubscribe");
-  MRUBY_ADD_COMMAND_PRE_HOOK("list");
-  MRUBY_ADD_COMMAND_PRE_HOOK("rlist");
-  MRUBY_ADD_COMMAND_PRE_HOOK("lsub");
-  MRUBY_ADD_COMMAND_PRE_HOOK("rlsub");
-  MRUBY_ADD_COMMAND_PRE_HOOK("status");
-  MRUBY_ADD_COMMAND_PRE_HOOK("check");
-  MRUBY_ADD_COMMAND_PRE_HOOK("close");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "select");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "examine");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "create");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "delete");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "rename");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "subscribe");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "unsubscribe");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "list");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "rlist");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "lsub");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "rlsub");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "status");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "check");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "close");
 
   /* mail control hook */
-  MRUBY_ADD_COMMAND_PRE_HOOK("append");
-  MRUBY_ADD_COMMAND_PRE_HOOK("expunge");
-  MRUBY_ADD_COMMAND_PRE_HOOK("search");
-  MRUBY_ADD_COMMAND_PRE_HOOK("fetch");
-  MRUBY_ADD_COMMAND_PRE_HOOK("store");
-  MRUBY_ADD_COMMAND_PRE_HOOK("copy");
-  MRUBY_ADD_COMMAND_PRE_HOOK("uid");
-  MRUBY_ADD_COMMAND_PRE_HOOK("noop");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "append");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "expunge");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "search");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "fetch");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "store");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "copy");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "uid");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "noop");
 
   /* state hook */
-  MRUBY_ADD_COMMAND_PRE_HOOK("capability");
-  MRUBY_ADD_COMMAND_PRE_HOOK("idle");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "capability");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "idle");
 
   /* etc hook */
-  MRUBY_ADD_COMMAND_PRE_HOOK("namespace");
-  MRUBY_ADD_COMMAND_PRE_HOOK("getquota");
-  MRUBY_ADD_COMMAND_PRE_HOOK("setquota");
-  MRUBY_ADD_COMMAND_PRE_HOOK("getquotaroot");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "namespace");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "getquota");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "setquota");
+  MRUBY_ADD_COMMAND_PRE_HOOK(cmd, "getquotaroot");
 }
 
 static void mruby_command_post(struct client_command_context *cmd)
 {
   //* mailbox management hook */
-  MRUBY_ADD_COMMAND_POST_HOOK("select");
-  MRUBY_ADD_COMMAND_POST_HOOK("examine");
-  MRUBY_ADD_COMMAND_POST_HOOK("create");
-  MRUBY_ADD_COMMAND_POST_HOOK("delete");
-  MRUBY_ADD_COMMAND_POST_HOOK("rename");
-  MRUBY_ADD_COMMAND_POST_HOOK("subscribe");
-  MRUBY_ADD_COMMAND_POST_HOOK("unsubscribe");
-  MRUBY_ADD_COMMAND_POST_HOOK("list");
-  MRUBY_ADD_COMMAND_POST_HOOK("rlist");
-  MRUBY_ADD_COMMAND_POST_HOOK("lsub");
-  MRUBY_ADD_COMMAND_POST_HOOK("rlsub");
-  MRUBY_ADD_COMMAND_POST_HOOK("status");
-  MRUBY_ADD_COMMAND_POST_HOOK("check");
-  MRUBY_ADD_COMMAND_POST_HOOK("close");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "select");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "examine");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "create");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "delete");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "rename");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "subscribe");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "unsubscribe");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "list");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "rlist");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "lsub");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "rlsub");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "status");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "check");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "close");
 
   /* mail control hook */
-  MRUBY_ADD_COMMAND_POST_HOOK("append");
-  MRUBY_ADD_COMMAND_POST_HOOK("expunge");
-  MRUBY_ADD_COMMAND_POST_HOOK("search");
-  MRUBY_ADD_COMMAND_POST_HOOK("fetch");
-  MRUBY_ADD_COMMAND_POST_HOOK("store");
-  MRUBY_ADD_COMMAND_POST_HOOK("copy");
-  MRUBY_ADD_COMMAND_POST_HOOK("uid");
-  MRUBY_ADD_COMMAND_POST_HOOK("noop");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "append");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "expunge");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "search");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "fetch");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "store");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "copy");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "uid");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "noop");
 
   /* state hook */
-  MRUBY_ADD_COMMAND_POST_HOOK("capability");
-  MRUBY_ADD_COMMAND_POST_HOOK("idle");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "capability");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "idle");
 
   /* etc hook */
-  MRUBY_ADD_COMMAND_POST_HOOK("namespace");
-  MRUBY_ADD_COMMAND_POST_HOOK("getquota");
-  MRUBY_ADD_COMMAND_POST_HOOK("setquota");
-  MRUBY_ADD_COMMAND_POST_HOOK("getquotaroot");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "namespace");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "getquota");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "setquota");
+  MRUBY_ADD_COMMAND_POST_HOOK(cmd, "getquotaroot");
 }
 
 void imap_mruby_plugin_init(struct module *module)
