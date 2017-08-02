@@ -13,6 +13,13 @@
 
 #define IMAP_MRUBY_IMAP_CONTEXT(obj) MODULE_CONTEXT(obj, imap_mruby_imap_module)
 
+#define MRUBY_ADD_COMMAND_PRE_HOOK(cmd_name)                                                                                \
+  if (strcasecmp(cmd->name, cmd_name) == 0)                                                                                 \
+  mruby_command_run_getenv(cmd, "mruby_pre_" cmd_name)
+#define MRUBY_ADD_COMMAND_POST_HOOK(cmd_name)                                                                               \
+  if (strcasecmp(cmd->name, cmd_name) == 0)                                                                                 \
+  mruby_command_run_getenv(cmd, "mruby_post_" cmd_name)
+
 struct imap_mruby_context {
   union imap_module_context module_ctx;
   mrb_state *mrb;
@@ -109,16 +116,12 @@ static void mruby_command_run_getenv(struct client_command_context *cmd, const c
 
 static void mruby_command_pre(struct client_command_context *cmd)
 {
-  if (strcasecmp(cmd->name, "CAPABILITY") == 0) {
-    mruby_command_run_getenv(cmd, "mruby_pre_capability");
-  }
+  MRUBY_ADD_COMMAND_PRE_HOOK("capability");
 }
 
 static void mruby_command_post(struct client_command_context *cmd)
 {
-  if (strcasecmp(cmd->name, "CAPABILITY") == 0) {
-    mruby_command_run_getenv(cmd, "mruby_post_capability");
-  }
+  MRUBY_ADD_COMMAND_POST_HOOK("capability");
 }
 
 void imap_mruby_plugin_init(struct module *module)
