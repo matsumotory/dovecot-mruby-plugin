@@ -23,6 +23,8 @@ make test
 
 - `conf.d/95-mruby.conf`
 
+callback Ruby scirpt per and post each IMAP commands.
+
 ```
 protocol imap {
   mail_plugins = $mail_plugins imap_mruby
