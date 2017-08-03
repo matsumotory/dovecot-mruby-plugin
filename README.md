@@ -1,6 +1,6 @@
 # [WIP] dovecot-mruby-plugin [![Build Status](https://travis-ci.org/matsumotory/dovecot-mruby-plugin.svg?branch=master)](https://travis-ci.org/matsumotory/dovecot-mruby-plugin)
 
-dovecot with mruby is a programmable IMAP/POP server scripting with mruby. Experimet Dovecot Plugin Develop Environment for mruby. [pmilter](https://github.com/matsumotory/pmilter) is a programmable Milter server scripting with mruby.
+dovecot included dovecot-mruby-plugin is a programmable IMAP/POP server scripting with mruby like [ngx_mruby](https://github.com/matsumotory/ngx_mruby) for nginx, [mod_mruby](https://github.com/matsumotory/mod_mruby) for apache httpd and [trusterd](https://github.com/matsumotory/trusterd) for HTTP/2 mruby Web server. Also [pmilter](https://github.com/matsumotory/pmilter) is a programmable Milter server scripting with mruby for SMTP server. 
 
 ## Quick Build and Install
 
