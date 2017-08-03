@@ -23,7 +23,7 @@ make test
 
 - `conf.d/95-mruby.conf`
 
-callback Ruby scirpt per and post each IMAP commands.
+callback Ruby scripts on pre and post each IMAP commands.
 
 ```
 protocol imap {
