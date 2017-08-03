@@ -29,6 +29,15 @@ protocol imap {
 }
 
 plugin {
+  # mruby_pre_${command name} = '${Ruby code}'
+  # mruby_post_${command name} = '${Ruby code}'
+  #
+  # support the following commands
+  #
+  # select examine create delete rename subscribe unsubscribe list rlist lsub rlsub
+  # status check close append expunge search fetch store copy uid noop capability idle
+  # namespace getquota setquota getquotaroot
+
   mruby_pre_capability = '"pre #{Dovecot::IMAP4.command_name}"'
   mruby_post_capability = '"post #{Dovecot::IMAP4.command_name}"'
 }
