@@ -11,11 +11,13 @@
 #define MRUBY_ADD_COMMAND_PRE_HOOK(cmd_ctx, cmd_name)                                                                  \
   if (strcasecmp(cmd_ctx->name, cmd_name) == 0) {                                                                      \
     mruby_command_run_getenv(cmd_ctx, "mruby_pre_" cmd_name);                                                          \
+    mruby_command_path_run_getenv(cmd_ctx, "mruby_pre_" cmd_name "_path");                                             \
     return;                                                                                                            \
   }
 #define MRUBY_ADD_COMMAND_POST_HOOK(cmd_ctx, cmd_name)                                                                 \
   if (strcasecmp(cmd_ctx->name, cmd_name) == 0) {                                                                      \
     mruby_command_run_getenv(cmd_ctx, "mruby_post_" cmd_name);                                                         \
+    mruby_command_path_run_getenv(cmd_ctx, "mruby_post_" cmd_name "_path");                                            \
     return;                                                                                                            \
   }
 
@@ -73,6 +75,8 @@ static bool cmd_mruby_path(struct client_command_context *cmd)
   }
 
   client_send_tagline(cmd, mrb_str_to_cstr(mrb, mrb_inspect(mrb, v)));
+  fclose(fp);
+
   return TRUE;
 }
 
@@ -133,6 +137,52 @@ static void imap_mruby_client_created(struct client **clientp)
   if (next_hook_client_created != NULL) {
     next_hook_client_created(clientp);
   }
+}
+
+static void mruby_command_path_run_getenv(struct client_command_context *cmd, const char *env)
+{
+  i_info("%s", __func__);
+  struct client *client = cmd->client;
+  struct imap_mruby_context *imctx;
+  mrb_state *mrb;
+  mrbc_context *c;
+  mrb_value v;
+  const char *path;
+  FILE *fp;
+
+  path = mail_user_plugin_getenv(client->user, env);
+
+  if (path == NULL) {
+    i_info("mruby %s hook declined", env);
+    return;
+  }
+
+  i_info("%s code-path: %s", env, path);
+
+  imctx = IMAP_MRUBY_IMAP_CONTEXT(client);
+  imctx->mruby_ctx->client = client;
+  imctx->mruby_ctx->cmd = cmd;
+  imctx->mruby_ctx->imctx = imctx;
+
+  mrb = imctx->mrb;
+  mrb->ud = imctx->mruby_ctx;
+  c = mrbc_context_new(mrb);
+  mrbc_filename(mrb, c, path);
+
+  if ((fp = fopen(path, "r")) == NULL) {
+    i_info("open %s failed", path);
+    return;
+  }
+
+  v = mrb_load_file_cxt(mrb, fp, c);
+  mrbc_context_free(mrb, c);
+
+  if (mrb->exc != 0 && (mrb_nil_p(v) || mrb_undef_p(v))) {
+    v = mrb_obj_value(mrb->exc);
+  }
+
+  fclose(fp);
+  i_info("run mruby file at %s, return value: %s", env, mrb_str_to_cstr(mrb, mrb_inspect(mrb, v)));
 }
 
 static void mruby_command_run_getenv(struct client_command_context *cmd, const char *env)
