@@ -135,7 +135,7 @@ plugin {
   mruby_pre_list_path = /path/to/pre.rb
   mruby_post_list_path = /path/to/post.rb
 }
-``
+```
 
 - connect dovecot and run LIST with CPU 100% to 30% limit
 
