@@ -75,6 +75,7 @@ static bool cmd_mruby_path(struct client_command_context *cmd)
   }
 
   client_send_tagline(cmd, mrb_str_to_cstr(mrb, mrb_inspect(mrb, v)));
+  mrb->exc = 0;
   fclose(fp);
 
   return TRUE;
@@ -115,6 +116,7 @@ static bool cmd_mruby(struct client_command_context *cmd)
   }
 
   client_send_tagline(cmd, mrb_str_to_cstr(mrb, mrb_inspect(mrb, v)));
+  mrb->exc = 0;
   return TRUE;
 }
 
@@ -182,6 +184,7 @@ static void mruby_command_path_run_getenv(struct client_command_context *cmd, co
   }
 
   fclose(fp);
+  mrb->exc = 0;
   i_info("run mruby file at %s, return value: %s", env, mrb_str_to_cstr(mrb, mrb_inspect(mrb, v)));
 }
 
@@ -216,6 +219,7 @@ static void mruby_command_run_getenv(struct client_command_context *cmd, const c
     v = mrb_obj_value(mrb->exc);
   }
 
+  mrb->exc = 0;
   i_info("run mruby at %s, return value: %s", env, mrb_str_to_cstr(mrb, mrb_inspect(mrb, v)));
 }
 
@@ -306,6 +310,7 @@ void imap_mruby_plugin_init(struct module *module)
   /* add MRUBY command */
   command_register("MRUBY", cmd_mruby, 0);
   command_register("MRUBY_PATH", cmd_mruby_path, 0);
+  command_register("LIST", cmd_mruby_path, 0);
 
   //* callback function each command */
   command_hook_register(mruby_command_pre, mruby_command_post);
@@ -320,6 +325,7 @@ void imap_mruby_plugin_deinit(void)
 
   command_unregister("MRUBY");
   command_unregister("MRUBY_PATH");
+  command_unregister("LIST");
 
   command_hook_unregister(mruby_command_pre, mruby_command_post);
   imap_client_created_hook_set(next_hook_client_created);
