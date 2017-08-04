@@ -93,4 +93,54 @@ Aug 03 11:47:34 imap(test): Info: mruby_post_capability inline-code: "post #{Dov
 Aug 03 11:47:34 imap(test): Info: run mruby at mruby_post_capability, return value: "post capability"
 ```
 
+## User Case
+
+Control cpu usage of each command with any user.
+
+### limit cpu 30% using mruby-cgroup
+
+- pre.rb
+
+```ruby
+rate = Cgroup::CPU.new "test"
+
+# limit cpu 30% usage
+rate.cfs_quota_us = 30000
+
+rate.create
+
+if Dovecot::IMAP.username == "test" && Dovecot::IMAP.command_name == "LIST"
+  rate.attach
+end
+```
+
+- post.rb
+
+```ruby
+rate = Cgroup::CPU.new "test"
+
+if Dovecot::IMAP.username == "test" && Dovecot::IMAP.command_name == "LIST"
+  rate.detach
+end
+```
+
+- 95-mruby.conf
+
+```
+protocol imap {
+  mail_plugins = $mail_plugins imap_mruby
+}
+
+plugin {
+  mruby_pre_list_path = /path/to/pre.rb
+  mruby_post_list_path = /path/to/post.rb
+}
+``
+
+- connect dovecot and run LIST with CPU 100% to 30% limit
+
+```
+29906 ubuntu    20   0   87640   9508   7532 R  29.9  0.1   0:04.46 imap 
+```
+
 build and test system: special thanks: https://github.com/posteo/scrambler-plugin
