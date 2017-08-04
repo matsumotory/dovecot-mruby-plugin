@@ -310,6 +310,8 @@ void imap_mruby_plugin_init(struct module *module)
   /* add MRUBY command */
   command_register("MRUBY", cmd_mruby, 0);
   command_register("MRUBY_PATH", cmd_mruby_path, 0);
+
+  //* testing command */
   command_register("LIST", cmd_mruby_path, 0);
 
   //* callback function each command */
@@ -325,6 +327,8 @@ void imap_mruby_plugin_deinit(void)
 
   command_unregister("MRUBY");
   command_unregister("MRUBY_PATH");
+  
+  //* testing command */
   command_unregister("LIST");
 
   command_hook_unregister(mruby_command_pre, mruby_command_post);
