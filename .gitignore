@@ -18,6 +18,7 @@ dovecot/configuration/dovecot-sql.conf.ext
 dovecot/configuration/conf.d/10-master.conf
 dovecot/configuration/conf.d/10-logging.conf
 dovecot/configuration/conf.d/80-mailfilter.conf
+dovecot/configuration/conf.d/95-mruby.conf
 dovecot/configuration/conf.d/auth-passwdfile.conf.ext
 dovecot/configuration/conf.d/auth-sql.conf.ext
 vendor/

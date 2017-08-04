@@ -1,0 +1,21 @@
+protocol imap {
+  mail_plugins = $mail_plugins imap_mruby
+}
+
+plugin {
+  # mruby_pre_${command name} = '${Ruby code}'
+  # mruby_post_${command name} = '${Ruby code}'
+  # mruby_pre_${command name}_path = /path/to/pre_code.rb
+  # mruby_post_${command name}_path = /path/to/post_code.rb
+  #
+  # support the following commands
+  #
+  # select examine create delete rename subscribe unsubscribe list rlist lsub rlsub
+  # status check close append expunge search fetch store copy uid noop capability idle
+  # namespace getquota setquota getquotaroot
+
+  mruby_pre_capability = '"pre #{Dovecot::IMAP.command_name} #{Dovecot::IMAP.username}"'
+  mruby_post_capability = '"post #{Dovecot::IMAP.command_name} #{Dovecot::IMAP.username}"'
+  mruby_pre_capability_path = <%= with_base_directory 'configuration/mruby_handler/pre_post_capability.rb' %>
+  mruby_post_capability_path = <%= with_base_directory 'configuration/mruby_handler/pre_post_capability.rb' %>
+}
