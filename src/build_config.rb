@@ -7,7 +7,7 @@ MRuby::Build.new do |conf|
 
   enable_debug
 
-  conf.gembox 'default'
+  conf.gembox 'full-core'
 
   conf.cc do |cc|
     cc.flags = [ENV['CFLAGS'], '-fPIC']
