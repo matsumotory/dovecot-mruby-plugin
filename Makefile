@@ -33,7 +33,7 @@ CFLAGS=-std=gnu99 \
 	-fPIC -fstack-check -ftrapv -DPIC -D_FORTIFY_SOURCE=2 -DHAVE_CONFIG_H \
 	-I$(DOVECOT_INCLUDE_DIR) $(MRUBY_CFLAGS)
 LDFLAGS=-gs -shared -rdynamic -Wl,-soname,lib95_imap_mruby_plugin.so.1 $(MRUBY_LDFLAGS)
-LIBS=$(MRUBY_LDFLAGS_BEFORE_LIBS) $(MRUBY_LIBS)
+LIBS=$(MRUBY_LIBS) $(MRUBY_LDFLAGS_BEFORE_LIBS)
 
 ifeq ($(DEBUG), 1)
 	CFLAGS+=-DDEBUG_STREAMS -g
