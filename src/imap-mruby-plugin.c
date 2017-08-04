@@ -28,6 +28,54 @@ static MODULE_CONTEXT_DEFINE_INIT(imap_mruby_imap_module, &imap_module_register)
 void imap_mruby_plugin_init(struct module *module);
 void imap_mruby_plugin_deinit(void);
 
+static bool cmd_mruby_path(struct client_command_context *cmd)
+{
+  i_info("%s", __func__);
+
+  mrb_value v;
+  const struct imap_arg *args;
+  const char *path;
+  mrbc_context *c;
+  FILE *fp;
+
+  struct client *client = cmd->client;
+  struct imap_mruby_context *imctx = IMAP_MRUBY_IMAP_CONTEXT(client);
+
+  mrb_state *mrb = imctx->mrb;
+
+  if (mrb == NULL) {
+    i_error("mrb_open() failed.");
+    return FALSE;
+  }
+
+  if (!client_read_args(cmd, 0, 0, &args)) {
+    return FALSE;
+  }
+
+  if (!imap_arg_get_atom(args, &path) || !IMAP_ARG_IS_EOL(&args[1])) {
+    client_send_command_error(cmd, "Invalid arguments.");
+    return TRUE;
+  }
+
+  c = mrbc_context_new(mrb);
+  mrbc_filename(mrb, c, path);
+
+  if ((fp = fopen(path, "r")) == NULL) {
+    client_send_command_error(cmd, "Invalid mruby path.");
+    return TRUE;
+  }
+
+  v = mrb_load_file_cxt(mrb, fp, c);
+  mrbc_context_free(mrb, c);
+
+  if (mrb->exc != 0 && (mrb_nil_p(v) || mrb_undef_p(v))) {
+    v = mrb_obj_value(mrb->exc);
+  }
+
+  client_send_tagline(cmd, mrb_str_to_cstr(mrb, mrb_inspect(mrb, v)));
+  return TRUE;
+}
+
 static bool cmd_mruby(struct client_command_context *cmd)
 {
   i_info("%s", __func__);
@@ -207,6 +255,7 @@ void imap_mruby_plugin_init(struct module *module)
 
   /* add MRUBY command */
   command_register("MRUBY", cmd_mruby, 0);
+  command_register("MRUBY_PATH", cmd_mruby_path, 0);
 
   //* callback function each command */
   command_hook_register(mruby_command_pre, mruby_command_post);
@@ -220,6 +269,8 @@ void imap_mruby_plugin_deinit(void)
   i_info("%s", __func__);
 
   command_unregister("MRUBY");
+  command_unregister("MRUBY_PATH");
+
   command_hook_unregister(mruby_command_pre, mruby_command_post);
   imap_client_created_hook_set(next_hook_client_created);
 }
