@@ -327,7 +327,7 @@ void imap_mruby_plugin_deinit(void)
 
   command_unregister("MRUBY");
   command_unregister("MRUBY_PATH");
-  
+
   //* testing command */
   command_unregister("LIST");
 
