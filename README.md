@@ -31,8 +31,11 @@ protocol imap {
 }
 
 plugin {
+  #
   # mruby_pre_${command name} = '${Ruby code}'
   # mruby_post_${command name} = '${Ruby code}'
+  # mruby_pre_${command name}_path = /path/to/pre_code.rb
+  # mruby_post_${command name}_path = /path/to/post_code.rb
   #
   # support the following commands
   #
@@ -42,6 +45,9 @@ plugin {
 
   mruby_pre_capability = '"pre #{Dovecot::IMAP4.command_name}"'
   mruby_post_capability = '"post #{Dovecot::IMAP4.command_name}"'
+
+  # mruby_pre_capability_path = /tmp/a.rb
+  # mruby_post_capability_path = /tmp/a.rb
 }
 ```
 
