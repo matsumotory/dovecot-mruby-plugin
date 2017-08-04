@@ -32,10 +32,17 @@ static mrb_value imap_mruby_imap_cmd_name(mrb_state *mrb, mrb_value self)
   return mrb_str_new_cstr(mrb, mctx->cmd->name);
 }
 
+static mrb_value imap_mruby_imap_username(mrb_state *mrb, mrb_value self)
+{
+  imap_mruby_internal_context *mctx = mrb->ud;
+  return mrb_str_new_cstr(mrb, mctx->cmd->client->user->username);
+}
+
 void imap_mruby_imap_class_init(mrb_state *mrb, struct RClass *class)
 {
   struct RClass *class_imap4;
 
-  class_imap4 = mrb_define_class_under(mrb, class, "IMAP4", mrb->object_class);
+  class_imap4 = mrb_define_class_under(mrb, class, "IMAP", mrb->object_class);
   mrb_define_class_method(mrb, class_imap4, "command_name", imap_mruby_imap_cmd_name, MRB_ARGS_NONE());
+  mrb_define_class_method(mrb, class_imap4, "username", imap_mruby_imap_username, MRB_ARGS_NONE());
 }
