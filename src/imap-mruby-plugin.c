@@ -3,10 +3,10 @@
 #include "mruby.h"
 #include "mruby/compile.h"
 #include "mruby/string.h"
+#include "mruby/variable.h"
+#include "mruby/hash.h"
 
 #include "imap-mruby-plugin-init.h"
-
-#define IMAP_MRUBY_IMAP_CONTEXT(obj) MODULE_CONTEXT(obj, imap_mruby_imap_module)
 
 #define MRUBY_ADD_COMMAND_PRE_HOOK(cmd_ctx, cmd_name)                                                                  \
   if (strcasecmp(cmd_ctx->name, cmd_name) == 0) {                                                                      \
@@ -23,9 +23,12 @@
 
 const char *imap_mruby_plugin_version = DOVECOT_ABI_VERSION;
 
+static MODULE_CONTEXT_DEFINE_INIT(imap_mruby_imap_module, &imap_module_register);
+
+#define IMAP_MRUBY_IMAP_CONTEXT(obj) MODULE_CONTEXT(obj, imap_mruby_imap_module)
+
 static struct module *imap_mruby_module;
 static imap_client_created_func_t *next_hook_client_created;
-static MODULE_CONTEXT_DEFINE_INIT(imap_mruby_imap_module, &imap_module_register);
 static mrb_state *global_mrb;
 
 void imap_mruby_plugin_init(struct module *module);
@@ -131,6 +134,44 @@ static bool cmd_mruby(struct client_command_context *cmd)
   return TRUE;
 }
 
+bool cmd_mruby_handler(struct client_command_context *cmd)
+{
+  struct client *client = cmd->client;
+  struct imap_mruby_context *imctx = IMAP_MRUBY_IMAP_CONTEXT(client);
+  mrb_state *mrb = imctx->mrb;
+  struct RClass *klass;
+  mrb_value v;
+  mrb_value cmd_block;
+  mrb_value cmd_hash;
+  mrb_value cmd_name;
+  mrb_sym cmd_hash_sym = mrb_intern_lit(mrb, "imap_mruby_command_register");
+
+  klass = mrb_class_get_under(mrb, mrb_class_get(mrb, "Dovecot"), "IMAP");
+
+  cmd_hash = mrb_mod_cv_get(mrb, klass, cmd_hash_sym);
+  cmd_name = mrb_funcall(mrb, mrb_str_new_cstr(mrb, cmd->name), "upcase", 0, NULL);
+  cmd_block = mrb_hash_get(mrb, cmd_hash, cmd_name);
+
+  if (mrb_type(cmd_block) == MRB_TT_PROC) {
+    v = mrb_yield_argv(mrb, cmd_block, 0, NULL);
+  } else {
+    i_error("cmd_block should be proc object: %s in %s with %s", mrb_str_to_cstr(mrb, mrb_inspect(mrb, cmd_block)),
+            mrb_str_to_cstr(mrb, mrb_inspect(mrb, cmd_hash)), mrb_str_to_cstr(mrb, mrb_inspect(mrb, cmd_name)));
+    client_send_command_error(cmd, "mruby runtime error");
+    mrb->exc = 0;
+    return TRUE;
+  }
+
+  if (mrb->exc != 0 && (mrb_nil_p(v) || mrb_undef_p(v))) {
+    v = mrb_obj_value(mrb->exc);
+  }
+
+  client_send_tagline(cmd, mrb_str_to_cstr(mrb, mrb_inspect(mrb, v)));
+  mrb->exc = 0;
+
+  return TRUE;
+}
+
 static void imap_mruby_client_created(struct client **clientp)
 {
   i_info("%s", __func__);
@@ -232,6 +273,40 @@ static void mruby_command_run_getenv(struct client_command_context *cmd, const c
   i_info("run mruby at %s, return value: %s", env, mrb_str_to_cstr(mrb, mrb_inspect(mrb, v)));
 }
 
+static void mruby_command_init_path_run(mrb_state *mrb, const char *path)
+{
+  i_info("%s", __func__);
+  mrbc_context *c;
+  mrb_value v;
+  FILE *fp;
+
+  if (path == NULL) {
+    i_info("mruby_init hook declined");
+    return;
+  }
+
+  i_info("code-path: %s", path);
+
+  c = mrbc_context_new(mrb);
+  mrbc_filename(mrb, c, path);
+
+  if ((fp = fopen(path, "r")) == NULL) {
+    i_info("open %s failed", path);
+    return;
+  }
+
+  v = mrb_load_file_cxt(mrb, fp, c);
+  mrbc_context_free(mrb, c);
+
+  if (mrb->exc != 0 && (mrb_nil_p(v) || mrb_undef_p(v))) {
+    v = mrb_obj_value(mrb->exc);
+  }
+
+  fclose(fp);
+  mrb->exc = 0;
+  i_info("run mruby file at mruby_init, return value: %s", mrb_str_to_cstr(mrb, mrb_inspect(mrb, v)));
+}
+
 static void mruby_command_pre(struct client_command_context *cmd)
 {
   i_info("%s", __func__);
@@ -324,6 +399,9 @@ void imap_mruby_plugin_init(struct module *module)
   }
 
   imap_mruby_set_state(mrb);
+
+  /* init handler from ENV */
+  mruby_command_init_path_run(mrb, getenv("DOVECOT_MRUBY_INIT_PATH"));
 
   /* add MRUBY command */
   command_register("MRUBY", cmd_mruby, 0);

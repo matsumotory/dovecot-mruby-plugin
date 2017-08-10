@@ -27,4 +27,6 @@ struct imap_mruby_context {
 void imap_hello_plugin_init(struct module *module);
 void imap_hello_plugin_deinit(void);
 
+bool cmd_mruby_handler(struct client_command_context *cmd);
+
 #endif

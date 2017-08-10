@@ -93,6 +93,58 @@ Aug 03 11:47:34 imap(test): Info: mruby_post_capability inline-code: "post #{Dov
 Aug 03 11:47:34 imap(test): Info: run mruby at mruby_post_capability, return value: "post capability"
 ```
 
+## Command register using mruby
+
+- /path/to/command_register.rb
+
+```ruby
+Dovecot::IMAP.command_register("udzura") do
+  "udzura"
+end
+
+Dovecot::IMAP.command_register("antipop") do
+  "I am antipop, " * 3
+end
+```
+
+### start dovecot with `DOVECOT_MRUBY_INIT_PATH` env
+
+- dovecot.conf
+
+```
+import_environment = DOVECOT_MRUBY_INIT_PATH
+```
+
+- start dovecot
+
+```
+DOVECOT_MRUBY_INIT_PATH=/path/to/command_register.rb ./dovecot/target/sbin/dovecot -c ./dovecot/configuration/dovecot.conf
+```
+
+- telnet example
+
+```
+$ telnet 127.0.0.1 6070
+Trying 127.0.0.1...
+Connected to 127.0.0.1.
+Escape character is '^]'.
+* OK [CAPABILITY IMAP4rev1 .,,] Dovecot ready.
+
+1 login test testPassword
+1 OK [CAPABILITY IMAP4rev1 ...]
+
+1 udzura
+1 "udzura" (0.001 + 0.000 secs).
+
+1 antipop
+1 "I am antipop, I am antipop, I am antipop, " (0.001 + 0.000 secs).
+
+1 logout
+* BYE Logging out
+1 OK Logout completed (0.001 + 0.000 secs).
+Connection closed by foreign host.
+```
+
 ## User Case
 
 Control cpu usage of each command with any user.
