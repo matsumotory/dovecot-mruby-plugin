@@ -98,12 +98,14 @@ Aug 03 11:47:34 imap(test): Info: run mruby at mruby_post_capability, return val
 - /path/to/command_register.rb
 
 ```ruby
-Dovecot::IMAP.command_register("udzura") do
-  "udzura"
-end
-
-Dovecot::IMAP.command_register("antipop") do
-  "I am antipop, " * 3
+%w(udzura antipop matsumotory test).each do |cmd|
+  Dovecot::IMAP.command_register(cmd) do
+    if cmd == Dovecot::IMAP.username
+      "You are me."
+    else
+      "I am #{cmd}.  Not you"
+    end
+  end
 end
 ```
 
@@ -128,16 +130,19 @@ $ telnet 127.0.0.1 6070
 Trying 127.0.0.1...
 Connected to 127.0.0.1.
 Escape character is '^]'.
-* OK [CAPABILITY IMAP4rev1 .,,] Dovecot ready.
+* OK [CAPABILITY ...] Dovecot ready.
 
 1 login test testPassword
-1 OK [CAPABILITY IMAP4rev1 ...]
+1 OK [CAPABILITY ...]
 
 1 udzura
-1 "udzura" (0.001 + 0.000 secs).
+1 "I am udzura.  Not you" (0.001 + 0.000 secs).
 
 1 antipop
-1 "I am antipop, I am antipop, I am antipop, " (0.001 + 0.000 secs).
+1 "I am antipop.  Not you" (0.001 + 0.000 secs).
+
+1 test
+1 "You are me." (0.001 + 0.000 secs).
 
 1 logout
 * BYE Logging out

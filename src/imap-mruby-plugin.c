@@ -146,6 +146,12 @@ bool cmd_mruby_handler(struct client_command_context *cmd)
   mrb_value cmd_name;
   mrb_sym cmd_hash_sym = mrb_intern_lit(mrb, IMAP_MRUBY_COMMAND_REG_ID);
 
+  /* path to mruby internal */
+  imctx->mruby_ctx->client = client;
+  imctx->mruby_ctx->cmd = cmd;
+  imctx->mruby_ctx->imctx = imctx;
+  mrb->ud = imctx->mruby_ctx;
+
   klass = mrb_class_get_under(mrb, mrb_class_get(mrb, "Dovecot"), "IMAP");
 
   cmd_hash = mrb_mod_cv_get(mrb, klass, cmd_hash_sym);

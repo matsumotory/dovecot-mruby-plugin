@@ -28,11 +28,11 @@ O_FILES=$(C_FILES:.c=.o)
 
 CC=gcc
 CFLAGS=-std=gnu99 \
-	-Wall -W -Wmissing-prototypes -Wmissing-declarations -Wpointer-arith -Wchar-subscripts -Wformat=2 \
+	-O0 -g -Wall -W -Wmissing-prototypes -Wmissing-declarations -Wpointer-arith -Wchar-subscripts -Wformat=2 \
 	-Wbad-function-cast -fno-builtin-strftime -Wstrict-aliasing=2 -Wl,-z,relro,-z,now \
 	-fPIC -fstack-check -ftrapv -DPIC -D_FORTIFY_SOURCE=2 -DHAVE_CONFIG_H \
 	-I$(DOVECOT_INCLUDE_DIR) $(MRUBY_CFLAGS)
-LDFLAGS=-gs -shared -rdynamic -Wl,-soname,lib95_imap_mruby_plugin.so.1 $(MRUBY_LDFLAGS)
+LDFLAGS=-O0 -g -gs -shared -rdynamic -Wl,-soname,lib95_imap_mruby_plugin.so.1 $(MRUBY_LDFLAGS)
 LIBS=$(MRUBY_LIBS) $(MRUBY_LDFLAGS_BEFORE_LIBS)
 
 ifeq ($(DEBUG), 1)
