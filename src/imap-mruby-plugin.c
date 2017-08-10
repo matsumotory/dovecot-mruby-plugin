@@ -26,9 +26,20 @@ const char *imap_mruby_plugin_version = DOVECOT_ABI_VERSION;
 static struct module *imap_mruby_module;
 static imap_client_created_func_t *next_hook_client_created;
 static MODULE_CONTEXT_DEFINE_INIT(imap_mruby_imap_module, &imap_module_register);
+static mrb_state *global_mrb;
 
 void imap_mruby_plugin_init(struct module *module);
 void imap_mruby_plugin_deinit(void);
+
+static void imap_mruby_set_state(mrb_state *mrb)
+{
+  global_mrb = mrb;
+}
+
+static mrb_state *imap_mruby_get_state()
+{
+  return global_mrb;
+}
 
 static bool cmd_mruby_path(struct client_command_context *cmd)
 {
@@ -129,10 +140,8 @@ static void imap_mruby_client_created(struct client **clientp)
   if (mail_user_is_plugin_loaded(client->user, imap_mruby_module)) {
     str_append(client->capability_string, " MRUBY");
     imctx = p_new(client->pool, struct imap_mruby_context, 1);
-    imctx->mrb = mrb_open();
+    imctx->mrb = imap_mruby_get_state();
     imctx->mruby_ctx = p_new(client->pool, imap_mruby_internal_context, 1);
-    /* dovecot class init */
-    imap_mruby_class_init(imctx->mrb);
     MODULE_CONTEXT_SET(client, imap_mruby_imap_module, imctx);
   }
 
@@ -307,6 +316,15 @@ void imap_mruby_plugin_init(struct module *module)
 {
   i_info("%s", __func__);
 
+  mrb_state *mrb = mrb_open();
+  if (mrb == NULL) {
+    i_error("mrb_open failed");
+  } else {
+    imap_mruby_class_init(mrb);
+  }
+
+  imap_mruby_set_state(mrb);
+
   /* add MRUBY command */
   command_register("MRUBY", cmd_mruby, 0);
   command_register("MRUBY_PATH", cmd_mruby_path, 0);
@@ -324,6 +342,7 @@ void imap_mruby_plugin_init(struct module *module)
 void imap_mruby_plugin_deinit(void)
 {
   i_info("%s", __func__);
+  mrb_state *mrb = imap_mruby_get_state();
 
   command_unregister("MRUBY");
   command_unregister("MRUBY_PATH");
@@ -333,6 +352,10 @@ void imap_mruby_plugin_deinit(void)
 
   command_hook_unregister(mruby_command_pre, mruby_command_post);
   imap_client_created_hook_set(next_hook_client_created);
+
+  if (mrb) {
+    mrb_close(mrb);
+  }
 }
 
 const char imap_mruby_plugin_binary_dependency[] = "imap";
