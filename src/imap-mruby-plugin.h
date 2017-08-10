@@ -10,6 +10,8 @@
 
 #include "mruby.h"
 
+#define IMAP_MRUBY_COMMAND_REG_ID "imap_mruby_command_register"
+
 extern const char imap_hello_plugin_binary_dependency[];
 
 typedef struct imap_mruby_internal_context {
