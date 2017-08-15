@@ -116,7 +116,6 @@ static void imap_mruby_client_created(struct client **clientp)
   struct imap_mruby_context *imctx;
 
   if (mail_user_is_plugin_loaded(client->user, imap_mruby_module)) {
-    str_append(client->capability_string, " MRUBY");
     imctx = p_new(client->pool, struct imap_mruby_context, 1);
     imctx->mrb = imap_mruby_get_state();
     imctx->mruby_ctx = p_new(client->pool, imap_mruby_internal_context, 1);
