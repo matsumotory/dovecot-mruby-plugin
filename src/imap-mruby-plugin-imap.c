@@ -30,34 +30,42 @@
 
 static mrb_value imap_mruby_imap_cmd_name(mrb_state *mrb, mrb_value self)
 {
-  imap_mruby_internal_context *mctx = mrb->ud;
+  imap_mruby_internal_context *mctx;
+
+  mctx = mrb->ud;
+
   return mrb_str_new_cstr(mrb, mctx->cmd->name);
 }
 
 static mrb_value imap_mruby_imap_username(mrb_state *mrb, mrb_value self)
 {
-  imap_mruby_internal_context *mctx = mrb->ud;
+  imap_mruby_internal_context *mctx;
+
+  mctx = mrb->ud;
+
   return mrb_str_new_cstr(mrb, mctx->cmd->client->user->username);
 }
 
 static mrb_value imap_mruby_imap_session_id(mrb_state *mrb, mrb_value self)
 {
-  imap_mruby_internal_context *mctx = mrb->ud;
+  imap_mruby_internal_context *mctx;
+
+  mctx = mrb->ud;
+
   return mrb_str_new_cstr(mrb, mctx->cmd->client->user->session_id);
 }
 
 static mrb_value imap_mruby_imap_command_register(mrb_state *mrb, mrb_value self)
 {
-  mrb_sym cmd_hash_sym = mrb_intern_lit(mrb, IMAP_MRUBY_COMMAND_REG_ID);
-  mrb_value cmd_hash;
-  mrb_value cmd_name;
-  mrb_value cmd_block;
   struct RClass *klass;
+  mrb_sym cmd_hash_sym;
+  mrb_value cmd_hash, cmd_name, cmd_block;
 
   mrb_get_args(mrb, "o&", &cmd_name, &cmd_block);
 
   command_register(mrb_str_to_cstr(mrb, cmd_name), cmd_mruby_handler, 0);
 
+  cmd_hash_sym = mrb_intern_lit(mrb, IMAP_MRUBY_COMMAND_REG_ID);
   klass = mrb_class_get_under(mrb, mrb_class_get(mrb, "Dovecot"), "IMAP");
   cmd_hash = mrb_mod_cv_get(mrb, klass, cmd_hash_sym);
 
