@@ -51,8 +51,9 @@ import_environment = DOVECOT_MRUBY_INIT_PATH
 
 - start dovecot
 
-```
-DOVECOT_MRUBY_INIT_PATH=/path/to/command_register.rb ./dovecot/target/sbin/dovecot -c ./dovecot/configuration/dovecot.conf
+```bash
+DOVECOT_MRUBY_INIT_PATH=/path/to/command_register.rb ./dovecot/target/sbin/dovecot \
+	-c ./dovecot/configuration/dovecot.conf
 ```
 
 - telnet example
