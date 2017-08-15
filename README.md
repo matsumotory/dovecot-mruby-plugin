@@ -19,17 +19,23 @@ make setup
 make test
 ```
 
-## Command register using mruby
+## IMAP command register using mruby
 
 - /path/to/command_register.rb
 
 ```ruby
-%w(udzura antipop matsumotory test).each do |cmd|
+%w(
+
+matsumotory
+test
+
+).each do |cmd|
   Dovecot::IMAP.command_register(cmd) do |args|
+    Dovecot::IMAP.send_line "Hi, #{Dovecot::IMAP.username}"
     if cmd == Dovecot::IMAP.username
-      "You are me."
+      Dovecot::IMAP.send_line "You are me."
     else
-      "I am #{cmd}.  Not you #{args}"
+      Dovecot::IMAP.send_line "I am #{cmd}.  Not you with #{args}"
     end
   end
 end
@@ -59,26 +65,27 @@ Escape character is '^]'.
 * OK [CAPABILITY ...] Dovecot ready.
 
 1 login test testPassword
-1 OK [CAPABILITY ...]
+1 OK [CAPABILITY ...] Logged in
 
-1 udzura
-1 "I am udzura.  Not you []" (0.001 + 0.000 secs).
+1 matsumotory hoge 1
+* matsumotory Hi, test
+* matsumotory I am matsumotory.  Not you with ["hoge", "1"]
+1 OK matsumotory completed (0.001 + 0.000 secs).
 
-1 udzura hoge fuga
-1 "I am udzura.  Not you [\"hoge\", \"fuga\"]" (0.001 + 0.000 secs).
+1 test 
+* test Hi, test
+* test You are me.
+1 OK test completed (0.001 + 0.000 secs).
 
-1 udzura hoge fuga 1
-1 "I am udzura.  Not you [\"hoge\", \"fuga\", \"1\"]" (0.001 + 0.000 secs).
-
-1 antipop
-1 "I am antipop.  Not you" (0.001 + 0.000 secs).
-
-1 test
-1 "You are me." (0.001 + 0.000 secs).
+1 matsumotory 
+* matsumotory Hi, test
+* matsumotory I am matsumotory.  Not you with []
+1 OK matsumotory completed (0.001 + 0.000 secs).
 
 1 logout
 * BYE Logging out
 1 OK Logout completed (0.001 + 0.000 secs).
+
 Connection closed by foreign host.
 ```
 
