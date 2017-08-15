@@ -62,6 +62,7 @@ bool cmd_mruby_handler(struct client_command_context *cmd)
   imctx->mruby_ctx->client = client;
   imctx->mruby_ctx->cmd = cmd;
   imctx->mruby_ctx->imctx = imctx;
+  imctx->mruby_ctx->cmd_done = FALSE;
 
   mrb = imctx->mrb;
   mrb->ud = imctx->mruby_ctx;
@@ -106,7 +107,9 @@ bool cmd_mruby_handler(struct client_command_context *cmd)
     return TRUE;
   }
 
-  client_send_tagline(cmd, t_strconcat("OK ", cmd->name, " completed.", NULL));
+  if (!imctx->mruby_ctx->cmd_done) {
+    client_send_tagline(cmd, t_strconcat("OK ", cmd->name, " completed.", NULL));
+  }
   return TRUE;
 }
 

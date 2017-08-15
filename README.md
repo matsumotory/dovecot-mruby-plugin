@@ -24,6 +24,7 @@ make test
 - /path/to/command_register.rb
 
 ```ruby
+# Register new commands
 %w(
 
 matsumotory
@@ -38,6 +39,12 @@ test
       Dovecot::IMAP.send_line "I am #{cmd}.  Not you with #{args}"
     end
   end
+end
+
+# Register CAP command which run CAPABILITY command
+Dovecot::IMAP.command_register("CAP") do |args|
+  Dovecot::IMAP.send_line "execute CAPABILITY commands"
+  Dovecot::IMAP.capability
 end
 ```
 
@@ -82,6 +89,11 @@ Escape character is '^]'.
 * matsumotory Hi, test
 * matsumotory I am matsumotory.  Not you with []
 1 OK matsumotory completed (0.001 + 0.000 secs).
+
+1 cap
+* cap execute CAPABILITY commands
+* CAPABILITY IMAP4rev1 LITERAL+ SASL-IR ...
+1 OK Capability completed (0.001 + 0.000 secs).
 
 1 logout
 * BYE Logging out

@@ -18,3 +18,8 @@ test
     end
   end
 end
+
+Dovecot::IMAP.command_register("CAP") do |args|
+  Dovecot::IMAP.send_line "execute CAPABILITY commands"
+  Dovecot::IMAP.capability
+end

@@ -95,6 +95,18 @@ static mrb_value imap_mruby_imap_send_line(mrb_state *mrb, mrb_value self)
   return self;
 }
 
+static mrb_value imap_mruby_imap_cmd_capability(mrb_state *mrb, mrb_value self)
+{
+  imap_mruby_internal_context *mctx;
+  bool ret;
+
+  mctx = mrb->ud;
+
+  mctx->cmd_done = cmd_capability(mctx->cmd);
+
+  return mctx->cmd_done ? mrb_true_value() : mrb_false_value();
+}
+
 void imap_mruby_imap_class_init(mrb_state *mrb, struct RClass *class)
 {
   struct RClass *class_imap4;
@@ -107,4 +119,7 @@ void imap_mruby_imap_class_init(mrb_state *mrb, struct RClass *class)
   mrb_define_class_method(mrb, class_imap4, "command_register", imap_mruby_imap_command_register,
                           MRB_ARGS_REQ(1) | MRB_ARGS_BLOCK());
   mrb_define_class_method(mrb, class_imap4, "send_line", imap_mruby_imap_send_line, MRB_ARGS_REQ(1));
+
+  /* exisiting imap command methods */
+  mrb_define_class_method(mrb, class_imap4, "capability", imap_mruby_imap_cmd_capability, MRB_ARGS_NONE());
 }

@@ -18,6 +18,7 @@ typedef struct imap_mruby_internal_context {
   struct client *client;
   struct client_command_context *cmd;
   struct imap_mruby_context *imctx;
+  bool cmd_done;
 } imap_mruby_internal_context;
 
 struct imap_mruby_context {
