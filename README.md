@@ -19,7 +19,70 @@ make setup
 make test
 ```
 
-## Configuration
+## Command register using mruby
+
+- /path/to/command_register.rb
+
+```ruby
+%w(udzura antipop matsumotory test).each do |cmd|
+  Dovecot::IMAP.command_register(cmd) do |args|
+    if cmd == Dovecot::IMAP.username
+      "You are me."
+    else
+      "I am #{cmd}.  Not you #{args}"
+    end
+  end
+end
+```
+
+### start dovecot with `DOVECOT_MRUBY_INIT_PATH` env
+
+- dovecot.conf
+
+```
+import_environment = DOVECOT_MRUBY_INIT_PATH
+```
+
+- start dovecot
+
+```
+DOVECOT_MRUBY_INIT_PATH=/path/to/command_register.rb ./dovecot/target/sbin/dovecot -c ./dovecot/configuration/dovecot.conf
+```
+
+- telnet example
+
+```
+$ telnet 127.0.0.1 6070
+Trying 127.0.0.1...
+Connected to 127.0.0.1.
+Escape character is '^]'.
+* OK [CAPABILITY ...] Dovecot ready.
+
+1 login test testPassword
+1 OK [CAPABILITY ...]
+
+1 udzura
+1 "I am udzura.  Not you []" (0.001 + 0.000 secs).
+
+1 udzura hoge fuga
+1 "I am udzura.  Not you [\"hoge\", \"fuga\"]" (0.001 + 0.000 secs).
+
+1 udzura hoge fuga 1
+1 "I am udzura.  Not you [\"hoge\", \"fuga\", \"1\"]" (0.001 + 0.000 secs).
+
+1 antipop
+1 "I am antipop.  Not you" (0.001 + 0.000 secs).
+
+1 test
+1 "You are me." (0.001 + 0.000 secs).
+
+1 logout
+* BYE Logging out
+1 OK Logout completed (0.001 + 0.000 secs).
+Connection closed by foreign host.
+```
+
+## Pre or Post command hook using mruby
 
 - `conf.d/95-mruby.conf`
 
@@ -91,69 +154,6 @@ Aug 03 11:47:34 imap(test): Info: mruby_command_post
 Aug 03 11:47:34 imap(test): Info: mruby_command_run_getenv
 Aug 03 11:47:34 imap(test): Info: mruby_post_capability inline-code: "post #{Dovecot::IMAP4.command_name}"
 Aug 03 11:47:34 imap(test): Info: run mruby at mruby_post_capability, return value: "post capability"
-```
-
-## Command register using mruby
-
-- /path/to/command_register.rb
-
-```ruby
-%w(udzura antipop matsumotory test).each do |cmd|
-  Dovecot::IMAP.command_register(cmd) do |args|
-    if cmd == Dovecot::IMAP.username
-      "You are me."
-    else
-      "I am #{cmd}.  Not you #{args}"
-    end
-  end
-end
-```
-
-### start dovecot with `DOVECOT_MRUBY_INIT_PATH` env
-
-- dovecot.conf
-
-```
-import_environment = DOVECOT_MRUBY_INIT_PATH
-```
-
-- start dovecot
-
-```
-DOVECOT_MRUBY_INIT_PATH=/path/to/command_register.rb ./dovecot/target/sbin/dovecot -c ./dovecot/configuration/dovecot.conf
-```
-
-- telnet example
-
-```
-$ telnet 127.0.0.1 6070
-Trying 127.0.0.1...
-Connected to 127.0.0.1.
-Escape character is '^]'.
-* OK [CAPABILITY ...] Dovecot ready.
-
-1 login test testPassword
-1 OK [CAPABILITY ...]
-
-1 udzura
-1 "I am udzura.  Not you []" (0.001 + 0.000 secs).
-
-1 udzura hoge fuga
-1 "I am udzura.  Not you [\"hoge\", \"fuga\"]" (0.001 + 0.000 secs).
-
-1 udzura hoge fuga 1
-1 "I am udzura.  Not you [\"hoge\", \"fuga\", \"1\"]" (0.001 + 0.000 secs).
-
-1 antipop
-1 "I am antipop.  Not you" (0.001 + 0.000 secs).
-
-1 test
-1 "You are me." (0.001 + 0.000 secs).
-
-1 logout
-* BYE Logging out
-1 OK Logout completed (0.001 + 0.000 secs).
-Connection closed by foreign host.
 ```
 
 ## User Case
