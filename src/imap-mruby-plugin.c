@@ -74,7 +74,7 @@ bool cmd_mruby_handler(struct client_command_context *cmd)
   cmd_block = mrb_hash_get(mrb, cmd_hash, cmd_name);
 
   if (!client_read_args(cmd, 0, 0, &args)) {
-    client_send_command_error(cmd, "mruby client_read_args error");
+    client_send_command_error(cmd, "Unexpected arguments.");
     return TRUE;
   }
 
@@ -82,7 +82,7 @@ bool cmd_mruby_handler(struct client_command_context *cmd)
   for (; !IMAP_ARG_IS_EOL(args); args++) {
     const char *str;
     if (!imap_arg_get_atom(args, &str)) {
-      client_send_command_error(cmd, "mruby imap_arg_get_atom error");
+      client_send_command_error(cmd, "Invalid arguments.");
       return TRUE;
     }
     mrb_ary_push(mrb, cmd_args, mrb_str_new_cstr(mrb, str));
@@ -93,18 +93,20 @@ bool cmd_mruby_handler(struct client_command_context *cmd)
   } else {
     i_error("cmd_block should be proc object: %s in %s with %s", mrb_str_to_cstr(mrb, mrb_inspect(mrb, cmd_block)),
             mrb_str_to_cstr(mrb, mrb_inspect(mrb, cmd_hash)), mrb_str_to_cstr(mrb, mrb_inspect(mrb, cmd_name)));
-    client_send_command_error(cmd, "mruby runtime error");
+    client_send_command_error(cmd, "Invalid command.");
     mrb->exc = 0;
     return TRUE;
   }
 
   if (mrb->exc != 0 && (mrb_nil_p(v) || mrb_undef_p(v))) {
     v = mrb_obj_value(mrb->exc);
+    i_error("mruby handler raise: %s", mrb_str_to_cstr(mrb, mrb_inspect(mrb, v)));
+    client_send_tagline(cmd, t_strconcat("NO ", cmd->name, " is invalid.", NULL));
+    mrb->exc = 0;
+    return TRUE;
   }
 
-  client_send_tagline(cmd, mrb_str_to_cstr(mrb, mrb_inspect(mrb, v)));
-  mrb->exc = 0;
-
+  client_send_tagline(cmd, t_strconcat("OK ", cmd->name, " completed.", NULL));
   return TRUE;
 }
 

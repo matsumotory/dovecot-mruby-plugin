@@ -28,6 +28,8 @@
 #include "mruby/variable.h"
 #include "mruby/hash.h"
 
+#include "dovecot/str.h"
+
 static mrb_value imap_mruby_imap_cmd_name(mrb_state *mrb, mrb_value self)
 {
   imap_mruby_internal_context *mctx;
@@ -80,6 +82,19 @@ static mrb_value imap_mruby_imap_command_register(mrb_state *mrb, mrb_value self
   return cmd_hash;
 }
 
+static mrb_value imap_mruby_imap_send_line(mrb_state *mrb, mrb_value self)
+{
+  imap_mruby_internal_context *mctx;
+  char *msg;
+
+  mctx = mrb->ud;
+  mrb_get_args(mrb, "z", &msg);
+
+  client_send_line(mctx->cmd->client, t_strconcat("* ", mctx->cmd->name, " ", msg, NULL));
+
+  return self;
+}
+
 void imap_mruby_imap_class_init(mrb_state *mrb, struct RClass *class)
 {
   struct RClass *class_imap4;
@@ -91,4 +106,5 @@ void imap_mruby_imap_class_init(mrb_state *mrb, struct RClass *class)
   mrb_define_class_method(mrb, class_imap4, "session_id", imap_mruby_imap_session_id, MRB_ARGS_NONE());
   mrb_define_class_method(mrb, class_imap4, "command_register", imap_mruby_imap_command_register,
                           MRB_ARGS_REQ(1) | MRB_ARGS_BLOCK());
+  mrb_define_class_method(mrb, class_imap4, "send_line", imap_mruby_imap_send_line, MRB_ARGS_REQ(1));
 }
