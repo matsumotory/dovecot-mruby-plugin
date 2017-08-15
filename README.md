@@ -99,11 +99,11 @@ Aug 03 11:47:34 imap(test): Info: run mruby at mruby_post_capability, return val
 
 ```ruby
 %w(udzura antipop matsumotory test).each do |cmd|
-  Dovecot::IMAP.command_register(cmd) do
+  Dovecot::IMAP.command_register(cmd) do |args|
     if cmd == Dovecot::IMAP.username
       "You are me."
     else
-      "I am #{cmd}.  Not you"
+      "I am #{cmd}.  Not you #{args}"
     end
   end
 end
@@ -136,7 +136,13 @@ Escape character is '^]'.
 1 OK [CAPABILITY ...]
 
 1 udzura
-1 "I am udzura.  Not you" (0.001 + 0.000 secs).
+1 "I am udzura.  Not you []" (0.001 + 0.000 secs).
+
+1 udzura hoge fuga
+1 "I am udzura.  Not you [\"hoge\", \"fuga\"]" (0.001 + 0.000 secs).
+
+1 udzura hoge fuga 1
+1 "I am udzura.  Not you [\"hoge\", \"fuga\", \"1\"]" (0.001 + 0.000 secs).
 
 1 antipop
 1 "I am antipop.  Not you" (0.001 + 0.000 secs).

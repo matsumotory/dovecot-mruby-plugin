@@ -5,6 +5,7 @@
 #include "mruby/string.h"
 #include "mruby/variable.h"
 #include "mruby/hash.h"
+#include "mruby/array.h"
 
 #include "imap-mruby-plugin-init.h"
 
@@ -144,7 +145,9 @@ bool cmd_mruby_handler(struct client_command_context *cmd)
   mrb_value cmd_block;
   mrb_value cmd_hash;
   mrb_value cmd_name;
+  mrb_value cmd_args;
   mrb_sym cmd_hash_sym = mrb_intern_lit(mrb, IMAP_MRUBY_COMMAND_REG_ID);
+  const struct imap_arg *args;
 
   /* path to mruby internal */
   imctx->mruby_ctx->client = client;
@@ -158,8 +161,23 @@ bool cmd_mruby_handler(struct client_command_context *cmd)
   cmd_name = mrb_funcall(mrb, mrb_str_new_cstr(mrb, cmd->name), "upcase", 0, NULL);
   cmd_block = mrb_hash_get(mrb, cmd_hash, cmd_name);
 
+  if (!client_read_args(cmd, 0, 0, &args)) {
+    client_send_command_error(cmd, "mruby client_read_args error");
+    return TRUE;
+  }
+
+  cmd_args = mrb_ary_new(mrb);
+  for (; !IMAP_ARG_IS_EOL(args); args++) {
+    const char *str;
+    if (!imap_arg_get_atom(args, &str)) {
+      client_send_command_error(cmd, "mruby imap_arg_get_atom error");
+      return TRUE;
+    }
+    mrb_ary_push(mrb, cmd_args, mrb_str_new_cstr(mrb, str));
+  }
+
   if (mrb_type(cmd_block) == MRB_TT_PROC) {
-    v = mrb_yield_argv(mrb, cmd_block, 0, NULL);
+    v = mrb_yield_argv(mrb, cmd_block, 1, &cmd_args);
   } else {
     i_error("cmd_block should be proc object: %s in %s with %s", mrb_str_to_cstr(mrb, mrb_inspect(mrb, cmd_block)),
             mrb_str_to_cstr(mrb, mrb_inspect(mrb, cmd_hash)), mrb_str_to_cstr(mrb, mrb_inspect(mrb, cmd_name)));
