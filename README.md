@@ -42,9 +42,14 @@ test
 end
 
 # Register CAP command which run CAPABILITY command
-Dovecot::IMAP.command_register("CAP") do |args|
+Dovecot::IMAP.alias_command_register("CAP") do
   Dovecot::IMAP.send_line "execute CAPABILITY commands"
   Dovecot::IMAP.capability
+end
+
+Dovecot::IMAP.alias_command_register("LIST_ALIAS") do
+  Dovecot::IMAP.send_line "alias LIST commands"
+  Dovecot::IMAP.list
 end
 ```
 
@@ -94,6 +99,15 @@ Escape character is '^]'.
 * cap execute CAPABILITY commands
 * CAPABILITY IMAP4rev1 LITERAL+ SASL-IR ...
 1 OK Capability completed (0.001 + 0.000 secs).
+
+1 list "" *
+* LIST (\HasNoChildren) "/" INBOX
+1 OK List completed (0.001 + 0.000 secs).
+
+1 list_alias "" *
+* list_alias alias LIST commands
+* LIST (\HasNoChildren) "/" INBOX
+1 OK List completed (0.001 + 0.000 secs).
 
 1 logout
 * BYE Logging out

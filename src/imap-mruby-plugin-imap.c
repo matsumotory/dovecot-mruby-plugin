@@ -106,16 +106,20 @@ static mrb_value imap_mruby_imap_send_line(mrb_state *mrb, mrb_value self)
   return self;
 }
 
-static mrb_value imap_mruby_imap_cmd_capability(mrb_state *mrb, mrb_value self)
-{
-  imap_mruby_internal_context *mctx;
+#define MRUBY_EXISTING_IMAP_COMMAND_REGISTER(command)                                                                     \
+  static mrb_value imap_mruby_imap_cmd_##command(mrb_state *mrb, mrb_value self)                                          \
+  {                                                                                                                    \
+    imap_mruby_internal_context *mctx;                                                                                 \
+    mctx = mrb->ud;                                                                                                    \
+    mctx->cmd_done = cmd_##command(mctx->cmd);                                                                            \
+    return mctx->cmd_done ? mrb_true_value() : mrb_false_value();                                                      \
+  }
 
-  mctx = mrb->ud;
+#define MRUBY_EXISTING_IMAP_COMMAND_METHOD(command, name)                                                                       \
+  mrb_define_class_method(mrb, class_imap4, name, imap_mruby_imap_cmd_##command, MRB_ARGS_NONE())
 
-  mctx->cmd_done = cmd_capability(mctx->cmd);
-
-  return mctx->cmd_done ? mrb_true_value() : mrb_false_value();
-}
+MRUBY_EXISTING_IMAP_COMMAND_REGISTER(capability);
+MRUBY_EXISTING_IMAP_COMMAND_REGISTER(list);
 
 void imap_mruby_imap_class_init(mrb_state *mrb, struct RClass *class)
 {
@@ -133,5 +137,6 @@ void imap_mruby_imap_class_init(mrb_state *mrb, struct RClass *class)
   mrb_define_class_method(mrb, class_imap4, "send_line", imap_mruby_imap_send_line, MRB_ARGS_REQ(1));
 
   /* exisiting imap command methods */
-  mrb_define_class_method(mrb, class_imap4, "capability", imap_mruby_imap_cmd_capability, MRB_ARGS_NONE());
+  MRUBY_EXISTING_IMAP_COMMAND_METHOD(capability, "capability");
+  MRUBY_EXISTING_IMAP_COMMAND_METHOD(list, "list");
 }

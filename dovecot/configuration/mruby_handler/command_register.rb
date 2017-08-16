@@ -20,6 +20,11 @@ test
 end
 
 Dovecot::IMAP.alias_command_register("CAP") do |args|
-  Dovecot::IMAP.send_line "execute CAPABILITY commands"
+  Dovecot::IMAP.send_line "alias CAPABILITY commands"
   Dovecot::IMAP.capability
+end
+
+Dovecot::IMAP.alias_command_register("LIST_ALIAS") do |args|
+  Dovecot::IMAP.send_line "alias LIST commands"
+  Dovecot::IMAP.list
 end
