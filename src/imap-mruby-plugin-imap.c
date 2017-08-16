@@ -106,16 +106,16 @@ static mrb_value imap_mruby_imap_send_line(mrb_state *mrb, mrb_value self)
   return self;
 }
 
-#define MRUBY_EXISTING_IMAP_COMMAND_REGISTER(command)                                                                     \
-  static mrb_value imap_mruby_imap_cmd_##command(mrb_state *mrb, mrb_value self)                                          \
+#define MRUBY_EXISTING_IMAP_COMMAND_REGISTER(command)                                                                  \
+  static mrb_value imap_mruby_imap_cmd_##command(mrb_state *mrb, mrb_value self)                                       \
   {                                                                                                                    \
     imap_mruby_internal_context *mctx;                                                                                 \
     mctx = mrb->ud;                                                                                                    \
-    mctx->cmd_done = cmd_##command(mctx->cmd);                                                                            \
+    mctx->cmd_done = cmd_##command(mctx->cmd);                                                                         \
     return mctx->cmd_done ? mrb_true_value() : mrb_false_value();                                                      \
   }
 
-#define MRUBY_EXISTING_IMAP_COMMAND_METHOD(command, name)                                                                       \
+#define MRUBY_EXISTING_IMAP_COMMAND_METHOD(command, name)                                                              \
   mrb_define_class_method(mrb, class_imap4, name, imap_mruby_imap_cmd_##command, MRB_ARGS_NONE())
 
 MRUBY_EXISTING_IMAP_COMMAND_REGISTER(capability);
