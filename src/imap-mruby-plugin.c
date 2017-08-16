@@ -164,7 +164,8 @@ bool cmd_mruby_handler(struct client_command_context *cmd)
   }
 
   if (imctx->mruby_ctx->cmd_done) {
-    i_error("existing IMAP cmd method like Dovecot::IMAP.capability in command_register. You should used Dovecot::IMAP.alias_command_register");
+    i_error("should not use existing IMAP cmd method like Dovecot::IMAP.capability in command_register. You should "
+            "used Dovecot::IMAP.alias_command_register");
   } else {
     client_send_tagline(cmd, t_strconcat("OK ", cmd->name, " completed.", NULL));
   }
@@ -207,7 +208,7 @@ static void mruby_command_path_run_getenv(struct client_command_context *cmd, co
     return;
   }
 
-  i_info("%s code-path: %s", env, path);
+  i_info("found mruby handler code from %s. code-path: %s", env, path);
 
   imctx = IMAP_MRUBY_IMAP_CONTEXT(client);
   imctx->mruby_ctx->client = client;
@@ -220,7 +221,7 @@ static void mruby_command_path_run_getenv(struct client_command_context *cmd, co
   mrbc_filename(mrb, c, path);
 
   if ((fp = fopen(path, "r")) == NULL) {
-    i_info("open %s failed", path);
+    i_error("open %s failed", path);
     return;
   }
 
@@ -286,13 +287,13 @@ static void mruby_command_init_path_run(mrb_state *mrb, const char *path)
     return;
   }
 
-  i_info("code-path: %s", path);
+  i_info("found mruby init code from env(DOVECOT_MRUBY_INIT_PATH). code-path: %s", path);
 
   c = mrbc_context_new(mrb);
   mrbc_filename(mrb, c, path);
 
   if ((fp = fopen(path, "r")) == NULL) {
-    i_info("open %s failed", path);
+    i_error("open %s failed", path);
     return;
   }
 
