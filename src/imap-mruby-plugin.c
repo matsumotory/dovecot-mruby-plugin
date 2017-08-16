@@ -45,6 +45,62 @@ static mrb_state *imap_mruby_get_state()
   return global_mrb;
 }
 
+static struct imap_mruby_context *imap_mruby_context_init(struct client_command_context *cmd)
+{
+  struct client *client;
+  struct imap_mruby_context *imctx;
+
+  client = cmd->client;
+  imctx = IMAP_MRUBY_IMAP_CONTEXT(client);
+  imctx->mruby_ctx->client = client;
+  imctx->mruby_ctx->cmd = cmd;
+  imctx->mruby_ctx->imctx = imctx;
+  imctx->mruby_ctx->cmd_done = FALSE;
+  imctx->mrb->ud = imctx->mruby_ctx;
+
+  return imctx;
+}
+
+bool cmd_mruby_alias_handler(struct client_command_context *cmd)
+{
+  struct imap_mruby_context *imctx;
+  struct RClass *klass;
+  mrb_state *mrb;
+  mrb_value v, cmd_block, cmd_hash, cmd_name;
+  mrb_sym cmd_hash_sym;
+
+  /* path to mruby internal */
+  imctx = imap_mruby_context_init(cmd);
+  mrb = imctx->mrb;
+
+  klass = mrb_class_get_under(mrb, mrb_class_get(mrb, "Dovecot"), "IMAP");
+  cmd_hash_sym = mrb_intern_lit(mrb, IMAP_MRUBY_COMMAND_REG_ID);
+  cmd_hash = mrb_mod_cv_get(mrb, klass, cmd_hash_sym);
+  cmd_name = mrb_funcall(mrb, mrb_str_new_cstr(mrb, cmd->name), "upcase", 0, NULL);
+  cmd_block = mrb_hash_get(mrb, cmd_hash, cmd_name);
+
+  if (mrb_type(cmd_block) != MRB_TT_PROC) {
+    i_error("cmd_block should be proc object: %s in %s with %s", mrb_str_to_cstr(mrb, mrb_inspect(mrb, cmd_block)),
+            mrb_str_to_cstr(mrb, mrb_inspect(mrb, cmd_hash)), mrb_str_to_cstr(mrb, mrb_inspect(mrb, cmd_name)));
+    client_send_command_error(cmd, "Invalid command.");
+    mrb->exc = 0;
+    return TRUE;
+  }
+
+  v = mrb_yield_argv(mrb, cmd_block, 0, NULL);
+
+  if (mrb->exc != 0 && (mrb_nil_p(v) || mrb_undef_p(v))) {
+    v = mrb_obj_value(mrb->exc);
+    i_error("mruby handler raise: %s", mrb_str_to_cstr(mrb, mrb_inspect(mrb, v)));
+    if (!imctx->mruby_ctx->cmd_done) {
+      client_send_tagline(cmd, t_strconcat("NO ", cmd->name, " is invalid.", NULL));
+    }
+    mrb->exc = 0;
+  }
+
+  return TRUE;
+}
+
 bool cmd_mruby_handler(struct client_command_context *cmd)
 {
   struct client *client;
@@ -107,9 +163,12 @@ bool cmd_mruby_handler(struct client_command_context *cmd)
     return TRUE;
   }
 
-  if (!imctx->mruby_ctx->cmd_done) {
+  if (imctx->mruby_ctx->cmd_done) {
+    i_error("existing IMAP cmd method like Dovecot::IMAP.capability in command_register. You should used Dovecot::IMAP.alias_command_register");
+  } else {
     client_send_tagline(cmd, t_strconcat("OK ", cmd->name, " completed.", NULL));
   }
+
   return TRUE;
 }
 

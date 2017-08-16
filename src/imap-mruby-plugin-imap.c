@@ -57,15 +57,16 @@ static mrb_value imap_mruby_imap_session_id(mrb_state *mrb, mrb_value self)
   return mrb_str_new_cstr(mrb, mctx->cmd->client->user->session_id);
 }
 
-static mrb_value imap_mruby_imap_command_register(mrb_state *mrb, mrb_value self)
+static mrb_value command_register_internal(mrb_state *mrb, command_func_t *func)
 {
+
   struct RClass *klass;
   mrb_sym cmd_hash_sym;
   mrb_value cmd_hash, cmd_name, cmd_block;
 
   mrb_get_args(mrb, "o&", &cmd_name, &cmd_block);
 
-  command_register(mrb_str_to_cstr(mrb, cmd_name), cmd_mruby_handler, 0);
+  command_register(mrb_str_to_cstr(mrb, cmd_name), func, 0);
 
   cmd_hash_sym = mrb_intern_lit(mrb, IMAP_MRUBY_COMMAND_REG_ID);
   klass = mrb_class_get_under(mrb, mrb_class_get(mrb, "Dovecot"), "IMAP");
@@ -80,6 +81,16 @@ static mrb_value imap_mruby_imap_command_register(mrb_state *mrb, mrb_value self
   mrb_mod_cv_set(mrb, klass, cmd_hash_sym, cmd_hash);
 
   return cmd_hash;
+}
+
+static mrb_value imap_mruby_imap_command_register(mrb_state *mrb, mrb_value self)
+{
+  return command_register_internal(mrb, cmd_mruby_handler);
+}
+
+static mrb_value imap_mruby_imap_alias_command_register(mrb_state *mrb, mrb_value self)
+{
+  return command_register_internal(mrb, cmd_mruby_alias_handler);
 }
 
 static mrb_value imap_mruby_imap_send_line(mrb_state *mrb, mrb_value self)
@@ -98,7 +109,6 @@ static mrb_value imap_mruby_imap_send_line(mrb_state *mrb, mrb_value self)
 static mrb_value imap_mruby_imap_cmd_capability(mrb_state *mrb, mrb_value self)
 {
   imap_mruby_internal_context *mctx;
-  bool ret;
 
   mctx = mrb->ud;
 
@@ -117,6 +127,8 @@ void imap_mruby_imap_class_init(mrb_state *mrb, struct RClass *class)
   mrb_define_class_method(mrb, class_imap4, "username", imap_mruby_imap_username, MRB_ARGS_NONE());
   mrb_define_class_method(mrb, class_imap4, "session_id", imap_mruby_imap_session_id, MRB_ARGS_NONE());
   mrb_define_class_method(mrb, class_imap4, "command_register", imap_mruby_imap_command_register,
+                          MRB_ARGS_REQ(1) | MRB_ARGS_BLOCK());
+  mrb_define_class_method(mrb, class_imap4, "alias_command_register", imap_mruby_imap_alias_command_register,
                           MRB_ARGS_REQ(1) | MRB_ARGS_BLOCK());
   mrb_define_class_method(mrb, class_imap4, "send_line", imap_mruby_imap_send_line, MRB_ARGS_REQ(1));
 
