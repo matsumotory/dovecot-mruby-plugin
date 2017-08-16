@@ -1,5 +1,5 @@
 # 
-# DOVECOT_MRUBY_INIT_PATH=./dovecot/configuration/mruby_handler/command_register.rb \
+# DOVECOT_MRUBY_INIT_PATH=`pwd`/dovecot/configuration/mruby_handler/command_register.rb \
 #           ./dovecot/target/sbin/dovecot -c ./dovecot/configuration/dovecot.conf
 #
 
