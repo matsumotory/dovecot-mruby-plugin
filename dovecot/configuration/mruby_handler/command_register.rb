@@ -19,12 +19,18 @@ test
   end
 end
 
-Dovecot::IMAP.alias_command_register("CAP") do |args|
+# alias command_register
+Dovecot::IMAP.register_command("HOGE") do |args|
+  Dovecot::IMAP.send_line "register hoge command"
+end
+
+Dovecot::IMAP.alias_command_register("CAP") do
   Dovecot::IMAP.send_line "alias CAPABILITY commands"
   Dovecot::IMAP.capability
 end
 
-Dovecot::IMAP.alias_command_register("LIST_ALIAS") do |args|
+# alias alias_command_register
+Dovecot::IMAP.register_alias("LIST_ALIAS") do
   Dovecot::IMAP.send_line "alias LIST commands"
   Dovecot::IMAP.list
 end

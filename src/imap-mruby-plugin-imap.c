@@ -130,11 +130,17 @@ void imap_mruby_imap_class_init(mrb_state *mrb, struct RClass *class)
   mrb_define_class_method(mrb, class_imap4, "command_name", imap_mruby_imap_cmd_name, MRB_ARGS_NONE());
   mrb_define_class_method(mrb, class_imap4, "username", imap_mruby_imap_username, MRB_ARGS_NONE());
   mrb_define_class_method(mrb, class_imap4, "session_id", imap_mruby_imap_session_id, MRB_ARGS_NONE());
+  mrb_define_class_method(mrb, class_imap4, "send_line", imap_mruby_imap_send_line, MRB_ARGS_REQ(1));
+
+  /* command register method */
   mrb_define_class_method(mrb, class_imap4, "command_register", imap_mruby_imap_command_register,
+                          MRB_ARGS_REQ(1) | MRB_ARGS_BLOCK());
+  mrb_define_class_method(mrb, class_imap4, "register_command", imap_mruby_imap_command_register,
                           MRB_ARGS_REQ(1) | MRB_ARGS_BLOCK());
   mrb_define_class_method(mrb, class_imap4, "alias_command_register", imap_mruby_imap_alias_command_register,
                           MRB_ARGS_REQ(1) | MRB_ARGS_BLOCK());
-  mrb_define_class_method(mrb, class_imap4, "send_line", imap_mruby_imap_send_line, MRB_ARGS_REQ(1));
+  mrb_define_class_method(mrb, class_imap4, "register_alias", imap_mruby_imap_alias_command_register,
+                          MRB_ARGS_REQ(1) | MRB_ARGS_BLOCK());
 
   /* exisiting imap command methods */
   MRUBY_EXISTING_IMAP_COMMAND_METHOD(capability, "capability");
