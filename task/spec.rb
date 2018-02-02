@@ -10,7 +10,8 @@ namespace :spec do
       Rake::Task['dovecot:start'].invoke
 
       specs = Dir[ File.expand_path('spec/integration/**/*_spec.rb', base_directory) ]
-      RSpec::Core::CommandLine.new(specs).run $stderr, $stdout
+      options = RSpec::Core::ConfigurationOptions.new(specs)
+      RSpec::Core::Runner.new(options).run $stderr, $stdout
     ensure
       Rake::Task['dovecot:stop'].invoke
     end
@@ -28,7 +29,8 @@ namespace :spec do
         end
 
         specs = Dir[ File.expand_path('spec/integration/**/*_spec.rb', base_directory) ]
-        RSpec::Core::CommandLine.new(specs).run $stderr, $stdout
+        options = RSpec::Core::ConfigurationOptions.new(specs)
+        RSpec::Core::Runner.new(options).run $stderr, $stdout
       ensure
         Rake::Task['dovecot:stop'].invoke
       end

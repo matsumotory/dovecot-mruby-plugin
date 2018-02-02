@@ -6,7 +6,7 @@ passdb {
   driver = sql
 
   # Path for SQL configuration file, see example-config/dovecot-sql.conf.ext
-  args = /home/ubuntu/src/dovecot-2.2.31/build/modules/dovecot/configuration/dovecot-sql.conf.ext
+  args = /home/ubuntu/DEV/dovecot-mruby-plugin/dovecot/configuration/dovecot-sql.conf.ext
 }
 
 # "prefetch" user database means that the passdb already provided the
@@ -18,7 +18,7 @@ userdb {
 
 userdb {
   driver = sql
-  args = /home/ubuntu/src/dovecot-2.2.31/build/modules/dovecot/configuration/dovecot-sql.conf.ext
+  args = /home/ubuntu/DEV/dovecot-mruby-plugin/dovecot/configuration/dovecot-sql.conf.ext
 }
 
 # If you don't have any user-specific settings, you can avoid the user_query

@@ -1,7 +1,7 @@
 source 'http://rubygems.org'
 
 gem 'rake'
-gem 'facter', '1.6'
+gem 'facter'
 
 group :test do
   gem 'rspec'
