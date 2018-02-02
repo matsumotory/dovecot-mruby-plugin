@@ -31,14 +31,14 @@ describe 'capability hello matsumotory' do
 
     it 'should allow the administrator to access the mail' do
       mails = @administrator.fetch 'testPassword'
-      mails.length.should == 1
-      mails[0].should =~ /test message one/
+      expect(mails.length).to eq 1
+      expect(mails[0]).to match /test message one/
     end
 
     it 'should respond the meta-data and mail' do
       mails = @mailer.receive
-      mails.length.should == 1
-      mails[0].should =~ /test message one/
+      expect(mails.length).to eq 1
+      expect(mails[0]).to match /test message one/
     end
 
   end

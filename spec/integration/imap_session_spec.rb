@@ -31,7 +31,7 @@ describe 'capability hello matsumotory' do
 
     it 'get capability that support mruby plugin' do
       line = @mailer.login 'test', 'testPassword'
-      line.should =~ /MRUBY/
+      expect(line).to match /MRUBY/
     end
   end
 end
