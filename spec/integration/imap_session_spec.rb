@@ -29,7 +29,7 @@ describe 'capability hello matsumotory' do
       # do nothing
     end
 
-    it 'get capability matsumotory command' do
+    it 'get capability that support mruby plugin' do
       line = @mailer.login 'test', 'testPassword'
       line.should =~ /MRUBY/
     end
